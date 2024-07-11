@@ -21,6 +21,7 @@ $ git clone https://github.com/Nguyenblur/c2x.git
 
 Then, install dependencies:
 ```bash
+$ cd c2x
 $ npm install
 ```
 
@@ -33,3 +34,14 @@ $ npm install
     <li>Copy fbstate and paste into the appstate.json file located in the root directory</li>
     <li>Instructional video <a href="https://www.youtube.com/watch?v=mFVtTPg4sWQ&t=97s">Here</a></li>
 </ul>
+
+## Running the app
+
+```bash
+# development
+$ npm run start
+```
+
+## Stay in touch
+
+- Author - [Nguyên Blue](https://github.com/Nguyenblur)
