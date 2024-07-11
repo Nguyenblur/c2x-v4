@@ -1,0 +1,11 @@
+package-lock.json
+node_modules
+.temp
+.replit
+replit.nix
+pnpm-lock.yaml
+.env
+.cache
+.npm
+log
+appstate.json
