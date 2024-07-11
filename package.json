@@ -1,0 +1,28 @@
+{
+		"name": "c2x",
+		"version": "1.2.15",
+		"description": "BOT MESSAGER NODEJS",
+		"main": "main.js",
+		"scripts": {
+				"start": "node index"
+		},
+		"author": "Nguyên Blue",
+		"license": "GPL-3.0",
+		"dependencies": {
+				"axios": "^1.7.2",
+				"child_process": "",
+				"dotenv": "^16.4.5",
+				"fs": "^0.0.1-security",
+				"fs-extra": "",
+				"hjson": "^3.2.2",
+				"moment-timezone": "",
+				"path": "",
+				"bluebird": "^2.11.0",
+    "cheerio": "^1.0.0-rc.10",
+    "https-proxy-agent": "^4.0.0",
+    "mqtt": "^4.2.8",
+    "npmlog": "^1.2.0",
+    "request": "^2.53.0",
+    "websocket-stream": "^5.5.0"
+	}
+}
