@@ -7,7 +7,7 @@ module.exports = {
     nopre: false,
     access: 1,
     wait: 3,
-    desc: "read/write/cre/edit/del/rename",
+    desc: "read/write/cre/edit/rm/rename",
     async execute({ api, args, threadID, body }) {
       if (args.length === 0) {
         const huongDanSuDung = `
@@ -15,7 +15,7 @@ module.exports = {
           - Để chỉnh sửa một tệp: \`!file edit <tên_tệp> <mã_mới>\`
           - Để đọc một tệp: \`!file read <tên_tệp>\`
           - Để tạo một tệp: \`!file cre <tên_tệp>\`
-          - Để xóa một tệp: \`!file del <tên_tệp>\`
+          - Để xóa một tệp: \`!file rm <tên_tệp>\`
           - Để đổi tên một tệp: \`!file rename <tên_cũ> <tên_mới>\`
         `;
         return api.sendMessage(huongDanSuDung, threadID);
@@ -83,7 +83,7 @@ module.exports = {
           `Đã tạo thành công tệp "${args[1]}.js".`,
           threadID
         );
-      } else if (args[0] == "del") {
+      } else if (args[0] == "rm") {
         fs.unlinkSync(`${__dirname}/${args[1]}.js`);
         return api.sendMessage(
           `Đã xoá file có tên "${args[1]}.js".`,
