@@ -47,6 +47,8 @@ const vietnameseWords = [
 
 const wordScrambleGames = {};
 const GAME_DURATION = 120000;
+let HINT_COST = 10000;
+const MAX_HINTS = 3;
 
 function getRandomWord() {
   const randomIndex = Math.floor(Math.random() * vietnameseWords.length);
@@ -64,99 +66,128 @@ function calculateReward(attempts) {
   return rewards[index];
 }
 
-function startWordScrambleGame(api, threadID) {
+async function startWordScrambleGame(api, threadID) {
   const originalWord = getRandomWord();
   const scrambledWord = scrambleWord(originalWord);
-  
+
   const game = {
     originalWord,
     scrambledWord,
     attempts: 0,
     startTime: Date.now(),
     timer: null,
-    winnerID: null,
-    winnerName: null,
-    attemptedPlayers: {} // Track attempts per player
+    winnerIDs: [],
+    attemptedPlayers: {},
+    hintsUsed: 0,
+    hintCost: HINT_COST
   };
-  
+
   wordScrambleGames[threadID] = game;
   game.timer = setTimeout(() => endWordScrambleGame(api, threadID), GAME_DURATION);
-  
+
+  const hintExplanation = `💡 Để sử dụng gợi ý, gõ "hint". Mỗi lần sử dụng gợi ý sẽ mất ${formatMoney(HINT_COST)} từ số tiền của bạn.`;
+
   api.sendMessage({
-    body: `🔠 Bắt đầu trò chơi 'Giải mã từ vựng tiếng Việt'!\nHãy giải mã từ: ${scrambledWord}`,
+    body: `🔠 Bắt đầu trò chơi 'Giải mã từ vựng tiếng Việt'!\nHãy giải mã từ: ${scrambledWord}\n${hintExplanation}`,
   }, threadID);
 }
 
-function handleWordScrambleInput(api, event, senderName) {
-  const threadID = event.threadID;
-  const senderID = event.senderID;
-  const message = event.body.trim().toLowerCase();
+async function handleWordScrambleInput(api, event) {
+  try {
+    const { threadID, senderID, messageID, body } = event;
+    const message = body.trim().toLowerCase();
+    const game = wordScrambleGames[threadID];
+    if (!game) return;
 
-  if (!wordScrambleGames[threadID]) return;
+    if (message === "end") {
+      clearTimeout(game.timer);
+      delete wordScrambleGames[threadID];
+      api.sendMessage(`⏱️ Bạn đã chọn kết thúc trò chơi.\nĐáp án đúng là "${game.originalWord}".\nTrò chơi đã kết thúc sau ${Math.floor((Date.now() - game.startTime) / 1000)} giây.`, threadID);
+      return;
+    }
 
-  const game = wordScrambleGames[threadID];
-  const originalWord = game.originalWord;
+    if (message === "hint") {
+      if (game.hintsUsed >= MAX_HINTS) {
+        api.sendMessage("❌ Bạn đã dùng hết số lần sử dụng gợi ý cho trò chơi này!", threadID);
+        return;
+      }
 
-  // Check if player has already used all 3 attempts
-  if (game.attemptedPlayers[senderID] >= 3) {
-    setTimeout(() => {
-      api.sendMessage(`❌ Bạn đã dùng hết số lần đoán cho trò chơi này!`, threadID);
-    }, 2000); // Delay of 2 seconds before sending the message
-    return;
-  }
+      const moneyData = loadMoneyData();
+      if (moneyData[senderID] < game.hintCost) {
+        api.sendMessage("❌ Bạn không đủ tiền để sử dụng gợi ý!", threadID);
+        return;
+      }
+      moneyData[senderID] -= game.hintCost;
+      saveMoneyData(moneyData);
+      game.hintsUsed++;
+      game.hintCost *= 2;
+      api.sendMessage(`💡 Gợi ý: "${game.originalWord.slice(0, game.hintsUsed * 2)}". Số tiền còn lại: ${formatMoney(moneyData[senderID])}`, threadID);
+      return;
+    }
 
-  // Increase the attempts count for the player
-  game.attemptedPlayers[senderID] = (game.attemptedPlayers[senderID] || 0) + 1;
-
-  // Compare normalized versions of message and originalWord
-  if (normalizeVietnamese(message) !== normalizeVietnamese(originalWord)) {
-    api.sendMessage(`❌ Đáp án không chính xác. Hãy thử lại!`, threadID);
-    return;
-  }
-
-  if (game.timer) {
     game.attempts++;
-    game.winnerID = senderID;
-    game.winnerName = senderName; // Set the winner's name
-    
-    const rewardMoney = calculateReward(game.attempts);
-    let moneyData = loadMoneyData(); // Placeholder function
-    moneyData[game.winnerID] = (moneyData[game.winnerID] || 0) + rewardMoney;
-    saveMoneyData(moneyData); // Placeholder function
-    
-    api.sendMessage({
-      body: `🎉 Chính xác! ${game.winnerName} đã giải mã từ "${originalWord}" sau ${game.attempts} lần đoán.\n💰 Bạn nhận được ${formatMoney(rewardMoney)}.\n💵 Số tiền hiện tại của bạn là: ${formatMoney(moneyData[game.winnerID])}`,
-      mentions: [{
-        tag: game.winnerName,
-        id: game.winnerID
-      }]
-    }, threadID);
-    
-    clearTimeout(game.timer);
-    delete wordScrambleGames[threadID];
+    if (normalizeVietnamese(message) !== normalizeVietnamese(game.originalWord)) {
+      api.setMessageReaction("❌", messageID, () => {}, true);
+      return;
+    }
+
+    if (!game.winnerIDs.includes(senderID)) game.winnerIDs.push(senderID);
+
+    if (game.timer) {
+      clearTimeout(game.timer);
+      delete wordScrambleGames[threadID];
+
+      const rewardMoney = calculateReward(game.attempts);
+      const moneyData = loadMoneyData();
+      const rewardPerPlayer = Math.floor(rewardMoney / game.winnerIDs.length);
+      game.winnerIDs.forEach(id => {
+        moneyData[id] = (moneyData[id] || 0) + rewardPerPlayer;
+      });
+      saveMoneyData(moneyData);
+
+      const winnerNamesPromises = game.winnerIDs.map(id =>
+        new Promise((resolve, reject) => {
+          api.getUserInfo(id, (err, ret) => {
+            if (err) reject(err);
+            resolve(ret[id].name);
+          });
+        })
+      );
+  
+      const winnerNames = await Promise.all(winnerNamesPromises);  
+
+      api.sendMessage({
+        body: `🎉 Chính xác! Những người chơi sau đã giải mã từ "${game.originalWord}": ${winnerNames.join(', ')}\n💰 Mỗi người nhận được ${formatMoney(rewardPerPlayer)}.`,
+        mentions: game.winnerIDs.map((id, index) => ({
+          tag: winnerNames[index],
+          id: id
+        }))
+      }, threadID);
+    }
+  } catch (error) {
+    console.error("Error handling input:", error);
   }
 }
 
 function endWordScrambleGame(api, threadID) {
   const game = wordScrambleGames[threadID];
-  
+
   if (!game || !game.timer) return;
 
-  const { originalWord, attempts, winnerID, winnerName, startTime } = game;
+  const { originalWord, startTime } = game;
   const elapsedTime = Date.now() - startTime;
 
   if (elapsedTime >= GAME_DURATION) {
     clearTimeout(game.timer);
     delete wordScrambleGames[threadID];
-    
-    const durationSeconds = Math.floor(GAME_DURATION / 1000);
-    const message = `⏱️ Bạn đã hết thời gian giải mã.\nKhông ai đoán đúng, Đáp án đúng là "${originalWord}".\nTrò chơi đã kết thúc sau ${durationSeconds} giây.`;
-    
-    api.sendMessage(message, threadID);
+
+    const durationSeconds = Math.floor(elapsedTime / 1000);
+    const endMessage = `⏱️ Bạn đã hết thời gian giải mã.\nKhông ai đoán đúng, Đáp án đúng là "${originalWord}".\nTrò chơi đã kết thúc sau ${durationSeconds} giây.`;
+
+    api.sendMessage(endMessage, threadID);
   }
 }
 
-// Function to normalize Vietnamese characters
 function normalizeVietnamese(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
 }
@@ -165,7 +196,7 @@ module.exports = {
   name: "wordscramble",
   author: "Nguyên Blue",
   category: "GAMES",
-  version: "1.0",
+  version: "1.1",
   nopre: true,
   access: 0,
   wait: 0,
@@ -184,9 +215,9 @@ module.exports = {
         return;
       }
 
-      if (event.type === "message" && event.isGroup) {
-        handleWordScrambleInput(api, event, senderName);
+      if (event.type === "message" && event.isGroup && event.body) {
+        await handleWordScrambleInput(api, event);
       }
     });
-  }
+  },
 };
