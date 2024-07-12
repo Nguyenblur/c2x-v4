@@ -5,7 +5,7 @@ const { doneAnimation, errAnimation } = require('./core(s)/logger/console');
 require('dotenv').config();
 
 const commandsDir = path.join(__dirname, './module(s)/commands'), eventsDir = path.join(__dirname, './module(s)/events');
-let commands = [], events = [];
+let commands = [], events = [], mqttListener = null;
 const cooldowns = new Map(), commandMap = new Map(), eventMap = new Map();
 
 async function startBot() {
@@ -41,10 +41,13 @@ async function startBot() {
                 console.info(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
                 commands = loadCommands(api);
                 events = loadEvents(api);
-                handleMQTTEvents(api);
+                startMQTTListener(api);
             }
         );
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        console.error(err);
+        setTimeout(startBot, 5000); 
+    }
 }
 
 function reloadCommandsAndEvents(api) {
@@ -92,7 +95,7 @@ function loadEvents(api) {
 }
 
 function handleMQTTEvents(api) {
-    api.listenMqtt(async (err, event) => {
+    mqttListener = api.listenMqtt(async (err, event) => {
         if (err) {
             console.error(err);
             return;
@@ -111,13 +114,13 @@ function handleMQTTEvents(api) {
             let args = [];
             let hasPrefix = false;
 
-            if(body.startsWith(PREFIX)){
-                hasPrefix=!0;
-                args=body.slice(PREFIX.length).trim().split(' ');
-                command=args.shift().toLowerCase();
-            }else{
-                command=body.trim().split(' ')[0].toLowerCase();
-                args=body.trim().split(' ').slice(1);
+            if (body.startsWith(PREFIX)) {
+                hasPrefix = true;
+                args = body.slice(PREFIX.length).trim().split(' ');
+                command = args.shift().toLowerCase();
+            } else {
+                command = body.trim().split(' ')[0].toLowerCase();
+                args = body.trim().split(' ').slice(1);
             }
 
             const commandModule = commandMap.get(command);
@@ -163,8 +166,24 @@ function handleMQTTEvents(api) {
                     console.error(`Lỗi khi xử lý sự kiện (${eventModule.name}):`, err);
                 }
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error(err);
+        }
     });
+}
+
+function startMQTTListener(api) {
+    if (mqttListener) {
+        mqttListener.stopListening();
+    }
+    handleMQTTEvents(api);
+    setInterval(() => {
+        console.log('Reloading MQTT listener...');
+        if (mqttListener) {
+            mqttListener.stopListening();
+        }
+        handleMQTTEvents(api);
+    }, 2 * 60 * 60 * 1000); 
 }
 
 function clearCommandsAndEvents() {

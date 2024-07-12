@@ -150,7 +150,7 @@ function endWordScrambleGame(api, threadID) {
     delete wordScrambleGames[threadID];
     
     const durationSeconds = Math.floor(GAME_DURATION / 1000);
-    const message = `⏱️ Bạn đã hết thời gian giải mã.\nĐáp án đúng là "${originalWord}". Người chơi ${winnerName ? `${winnerName} (${winnerID})` : 'không ai'} đã giành chiến thắng sau ${attempts} lần đoán.\nTrò chơi đã kết thúc sau ${durationSeconds} giây.`;
+    const message = `⏱️ Bạn đã hết thời gian giải mã.\nKhông ai đoán đúng, Đáp án đúng là "${originalWord}".\nTrò chơi đã kết thúc sau ${durationSeconds} giây.`;
     
     api.sendMessage(message, threadID);
   }
