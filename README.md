@@ -1,4 +1,4 @@
-dự án vẫn đang phát triển, và nhận góp ý từ cộng đồng!
+dự án vẫn đang phát triển, update liên tục, và nhận góp ý từ cộng đồng!
 
 # A Simple Facebook Messenger Bot using Node.js
 
