@@ -9,3 +9,5 @@ pnpm-lock.yaml
 .npm
 log
 appstate.json
+core(s)/database/money.json
+core(s)/database/checktt

@@ -111,13 +111,13 @@ function handleMQTTEvents(api) {
             let args = [];
             let hasPrefix = false;
 
-            if (body.startsWith(PREFIX)) {
-                hasPrefix = true;
-                args = body.slice(PREFIX.length).trim().split(' ');
-                command = args.shift().toLowerCase();
-            } else {
-                command = body.trim().split(' ')[0].toLowerCase();
-                args = body.trim().split(' ').slice(1);
+            if(body.startsWith(PREFIX)){
+                hasPrefix=!0;
+                args=body.slice(PREFIX.length).trim().split(' ');
+                command=args.shift().toLowerCase();
+            }else{
+                command=body.trim().split(' ')[0].toLowerCase();
+                args=body.trim().split(' ').slice(1);
             }
 
             const commandModule = commandMap.get(command);

@@ -39,7 +39,7 @@ $ npm install
 
 ```bash
 # development
-$ npm start
+$ npm run start
 ```
 
 ## Stay in touch
