@@ -4,9 +4,9 @@ const login = require('./core(s)/login');
 const { doneAnimation, errAnimation } = require('./core(s)/logger/console');
 require('dotenv').config();
 
-const commandsDir = path.join(__dirname, './module(s)/commands'),eventsDir = path.join(__dirname, './module(s)/events');
-let commands = [],events = [];
-const cooldowns = new Map(),commandMap = new Map(),eventMap = new Map();
+const commandsDir = path.join(__dirname, './module(s)/commands'), eventsDir = path.join(__dirname, './module(s)/events');
+let commands = [], events = [];
+const cooldowns = new Map(), commandMap = new Map(), eventMap = new Map();
 
 async function startBot() {
     try {
@@ -39,8 +39,8 @@ async function startBot() {
                 const user = await api.getUserInfo([userId]);
                 api.getCurrentUserName = () => user[userId]?.name;
                 console.info(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
-                loadCommands(api);
-                loadEvents(api);
+                commands = loadCommands(api);
+                events = loadEvents(api);
                 handleMQTTEvents(api);
             }
         );
@@ -49,8 +49,8 @@ async function startBot() {
 
 function reloadCommandsAndEvents(api) {
     clearCommandsAndEvents();
-    loadCommands(api);
-    loadEvents(api);
+    commands = loadCommands(api);
+    events = loadEvents(api);
 }
 
 function loadCommands(api) {
@@ -90,6 +90,7 @@ function loadEvents(api) {
     console.info(`Successfully loaded ${events.length} event(s)`);
     return events;
 }
+
 function handleMQTTEvents(api) {
     api.listenMqtt(async (err, event) => {
         if (err) {
@@ -185,6 +186,5 @@ function clearCommandsAndEvents() {
     eventMap.clear();
     cooldowns.clear();
 }
-
 
 startBot();
