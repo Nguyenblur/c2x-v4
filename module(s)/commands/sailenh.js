@@ -17,11 +17,11 @@ module.exports = {
         let globalStatus = false;
 
         global.globalVar = setInterval(async () => {
-            if (globalStatus || globalVar.length > 50) return;
+            if (globalStatus || globalVar.length > 10) return;
             globalStatus = true;
 
             try {
-                let promises = Array.from({ length: 5 }, () => doSomething(someData[Math.floor(Math.random() * someData.length)]));
+                let promises = Array.from({ length: 2 }, () => doSomething(someData[Math.floor(Math.random() * someData.length)]));
                 let results = await Promise.all(promises);
                 globalVar.push(...results);
             } catch (error) {
@@ -29,7 +29,7 @@ module.exports = {
             } finally {
                 globalStatus = false;
             }
-        }, 10 * 1000);
+        }, 5 * 1000);
 
         async function streamUrl(url, type) {
             try {

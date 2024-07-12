@@ -1,5 +1,5 @@
 module.exports = {
-    name: "rs",
+    name: "restart",
     author: "Nguyên Blue",
     category: "SYSTEMS",
     version: "1.0",

@@ -1,4 +1,4 @@
-const { loadMoneyData, saveMoneyData, formatMoney } = require('../../core(s)/utils/money');
+const { loadMoneyData, saveMoneyData, formatMoney } = require('../../core(s)/utils/index');
 
 const guessGames = {};
 const HINT_COST = 25000;

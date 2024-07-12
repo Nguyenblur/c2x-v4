@@ -1,4 +1,4 @@
-const { loadMoneyData, saveMoneyData, formatMoney } = require('../../core(s)/utils/money');
+const { loadMoneyData, saveMoneyData, formatMoney } = require('../../core(s)/utils/index');
 
 const vietnameseWords = [
   "điện thoại", "máy tính", "bàn phím", "chuột", "tivi", "máy giặt", "bếp ga", "quạt điện", "đèn", "ghế sofa",
