@@ -44,9 +44,8 @@ const vietnameseWords = [
   "phương án", "công cụ", "phương pháp", "quy trình", "phương tiện", "quy tắc", "quy định", "tiêu chuẩn", "hành vi", "văn hóa",
   "hệ thống", "tổ chức", "thực hiện", "phát hành", "cập nhật", "nâng cấp", "bảo mật", "tối ưu", "tái chế", "tái tạo"
 ];
-
 const wordScrambleGames = {};
-const GAME_DURATION = 120000;
+const GAME_DURATION = 120000; // 2 minutes
 let HINT_COST = 10000;
 const MAX_HINTS = 3;
 
@@ -79,16 +78,15 @@ async function startWordScrambleGame(api, event) {
     winnerIDs: [],
     attemptedPlayers: {},
     hintsUsed: 0,
-    hintCost: HINT_COST
+    hintCost: HINT_COST,
+    hintExplanation: `💡 Để sử dụng gợi ý, gõ "hint". Mỗi lần sử dụng gợi ý sẽ mất ${formatMoney(HINT_COST)} từ số tiền của bạn.`
   };
 
   wordScrambleGames[event.threadID] = game;
   game.timer = setTimeout(() => endWordScrambleGame(api, event), GAME_DURATION);
 
-  const hintExplanation = `💡 Để sử dụng gợi ý, gõ "hint". Mỗi lần sử dụng gợi ý sẽ mất ${formatMoney(HINT_COST)} từ số tiền của bạn.`;
-
   api.sendMessage({
-    body: `🔠 Bắt đầu trò chơi 'Giải mã từ vựng tiếng Việt'!\nHãy giải mã từ: ${scrambledWord}\n${hintExplanation}`,
+    body: `🔠 Bắt đầu trò chơi 'Giải mã từ vựng tiếng Việt'!\nHãy giải mã từ: ${scrambledWord}\n${game.hintExplanation}`,
   }, event.threadID);
 }
 
@@ -152,11 +150,13 @@ async function handleWordScrambleInput(api, event) {
           });
         })
       );
-  
-      const winnerNames = await Promise.all(winnerNamesPromises);  
+
+      const winnerNames = await Promise.all(winnerNamesPromises);
+
+      const durationSeconds = Math.floor((Date.now() - game.startTime) / 1000);
 
       api.sendMessage({
-        body: `🎉 Chính xác! Những người chơi sau đã giải mã từ "${game.originalWord}": ${winnerNames.join(', ')}\n💰 Mỗi người nhận được ${formatMoney(rewardPerPlayer)}.`,
+        body: `🎉 Chính xác! Chúc mừng người chơi ${winnerNames.join(', ')} đã giải mã từ "${game.originalWord}"\n🕑 Thời gian hoàn thành ${durationSeconds} giây\n💰 Nhận được ${formatMoney(rewardPerPlayer)}.`,
         mentions: game.winnerIDs.map((id, index) => ({
           tag: winnerNames[index],
           id: id
@@ -195,7 +195,7 @@ module.exports = {
   name: "wordscramble",
   author: "Nguyên Blue",
   category: "GAMES",
-  version: "1.1",
+  version: "1.2",
   nopre: true,
   access: 0,
   wait: 0,
