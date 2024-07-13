@@ -29,9 +29,9 @@ module.exports = {
   access: 0,
   wait: 3,
   desc: "Dùng để lấy token nhiều dạng khác nhau.",
-  async execute({ api, threadID, args }) {
+  async execute({ api, event, args }) {
     if (args.length < 2) {
-      return api.sendMessage("Bạn phải cung cấp cả cookie và loại token để lấy token.\n\ncác loại token hợp lệ\nEAAAAU, EAADo1, EAAAAA, EAADYP, EAAD6V7, EAAC2S, EAAGOf, EAAVBz, EAAC4c, EAACW5, EAABu2, EAAQr1, EAAGNO, EAAHbH, EAACng, EAACeH", threadID);
+      return api.sendMessage("Bạn phải cung cấp cả cookie và loại token để lấy token.\n\ncác loại token hợp lệ\nEAAAAU, EAADo1, EAAAAA, EAADYP, EAAD6V7, EAAC2S, EAAGOf, EAAVBz, EAAC4c, EAACW5, EAABu2, EAAQr1, EAAGNO, EAAHbH, EAACng, EAACeH", event.threadID);
     }
 
     const cookie = args[0];
@@ -54,17 +54,17 @@ module.exports = {
         "EAAGNO: Token Business Manager\n" +
         "EAAHbH: Token Messenger Kis IOS\n" +
         "EAACng: Token Messenger House IOS\n" +
-        "EAACeH: Token Facebook IPAD", threadID);
+        "EAACeH: Token Facebook IPAD", event.threadID);
     }
 
     try {
       const response = await axios.get(`https://alotoi.com/fb/?cookie=${cookie}&type=${type}`);
       const data = response.data.token;
 
-      api.sendMessage(data, threadID);
+      api.sendMessage(data, event.threadID);
     } catch (error) {
       console.error(error);
-      api.sendMessage("Đã xảy ra lỗi khi lấy token.", threadID);
+      api.sendMessage("Đã xảy ra lỗi khi lấy token.", event.threadID);
     }
   }
 };

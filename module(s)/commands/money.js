@@ -9,25 +9,26 @@ module.exports = {
   access: 0,
   wait: 3,
   desc: "Dùng để check money user",
-  async execute({api, senderName, senderID, threadID}) {
+  async execute({api, event }) {
     const moneyData = loadMoneyData();
+    const userInfo = await api.getUserInfo(event.senderID),name = userInfo[event.senderID]?.name || 'Người Dùng';
 
-    if (moneyData[senderID]) {
+    if (moneyData[event.senderID]) {
       api.sendMessage({
-        body: `👉 Số tiền hiện tại của ${senderName} là: ${formatMoney(moneyData[senderID])}`,
+        body: `👉 Số tiền hiện tại của ${name} là: ${formatMoney(moneyData[event.senderID])}`,
         mentions: [{
-          tag: senderName,
-          id: senderID
+          tag: name,
+          id: event.senderID
         }]
-      }, threadID);
+      }, event.threadID);
      } else {
 
    api.sendMessage({
-        body: `${senderName} còn đúng cái nịt!`,
+        body: `${name} còn đúng cái nịt!`,
         mentions: [{
-          tag: senderName,
-          id: senderID
+          tag: name,
+          id: event.senderID
         }]
-      }, threadID);    }
+      }, event.threadID);    }
   }
 };

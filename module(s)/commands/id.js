@@ -9,7 +9,7 @@ module.exports = {
     access: 1,
     wait: 3,
     desc: "Lấy uid/id bài viết, nhóm, người dùng",
-    async execute({ api, event, args, threadID, senderID }) {
+    async execute({ api, event, args }) {
       let msg = []
       if (args.length > 0) {
         const match = args[0].match(regex);
@@ -28,14 +28,14 @@ module.exports = {
           let data = res.data;
           if (data.uid && data.uid != "") msg.push(`Id từ link của tin nhắn trả lời: ${data.uid}`);
         }
-        msg.push("Id ngưởi gửi tin nhắn được trả lời: " + event.messageReply.senderID);
+        msg.push("Id ngưởi gửi tin nhắn được trả lời: " + event.messageReply.event.senderID);
         msg.push("Id tin nhắn được trả lời: " + event.messageReply.messageID);
       }
       if (event.isGroup) {
-        msg.push("Id nhóm: " + threadID);
+        msg.push("Id nhóm: " + event.threadID);
       }
-      msg.push("Id của bạn: " + senderID);
-      api.sendMessage(msg.join("\n"), threadID);
+      msg.push("Id của bạn: " + event.senderID);
+      api.sendMessage(msg.join("\n"), event.threadID);
     }
   };
   

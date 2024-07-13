@@ -7,14 +7,14 @@ module.exports = {
   author: "Nguyên Blue",
   version: "1.0",
   desc: "Ghi log tương tác thành viên của nhóm.",
-  async execute({ event, threadID, senderID, body }) {
+  async execute({ event }) {
     try {
       if (!event.isGroup) return;
 
       const today = moment.tz("Asia/Ho_Chi_Minh").day();
       const thisMonth = moment.tz("Asia/Ho_Chi_Minh").month();
 
-      if (!fs.existsSync(path + threadID + '.json')) {
+      if (!fs.existsSync(path + event.threadID + '.json')) {
         const newObj = {
           total: [],
           week: [],
@@ -29,10 +29,10 @@ module.exports = {
             month: [],
           },
         };
-        fs.writeFileSync(path + threadID + '.json', JSON.stringify(newObj, null, 4));
+        fs.writeFileSync(path + event.threadID + '.json', JSON.stringify(newObj, null, 4));
       }
 
-      let newObj = JSON.parse(fs.readFileSync(path + threadID + '.json'));
+      let newObj = JSON.parse(fs.readFileSync(path + event.threadID + '.json'));
 
       if (newObj.time !== today) {
         newObj.time = today;
@@ -45,7 +45,7 @@ module.exports = {
         }
       }
 
-      if (body) { 
+      if (event.body) { 
         const UserIDs = event.participantIDs || [];
 
         for (const user of UserIDs) {
@@ -109,18 +109,18 @@ module.exports = {
         }
       }
 
-      fs.writeFileSync(path + threadID + '.json', JSON.stringify(newObj, null, 4));
+      fs.writeFileSync(path + event.threadID + '.json', JSON.stringify(newObj, null, 4));
 
-      const threadData = JSON.parse(fs.readFileSync(path + threadID + '.json'));
+      const threadData = JSON.parse(fs.readFileSync(path + event.threadID + '.json'));
 
-      const userData_week_index = threadData.week.findIndex(e => e.id === senderID);
-      const userData_day_index = threadData.day.findIndex(e => e.id === senderID);
-      const userData_month_index = threadData.month.findIndex(e => e.id === senderID);
-      const userData_total_index = threadData.total.findIndex(e => e.id === senderID);
+      const userData_week_index = threadData.week.findIndex(e => e.id === event.senderID);
+      const userData_day_index = threadData.day.findIndex(e => e.id === event.senderID);
+      const userData_month_index = threadData.month.findIndex(e => e.id === event.senderID);
+      const userData_total_index = threadData.total.findIndex(e => e.id === event.senderID);
 
       if (userData_total_index === -1) {
         threadData.total.push({
-          id: senderID,
+          id: event.senderID,
           count: 1,
         });
       } else {
@@ -129,7 +129,7 @@ module.exports = {
 
       if (userData_week_index === -1) {
         threadData.week.push({
-          id: senderID,
+          id: event.senderID,
           count: 1
         });
       } else {
@@ -138,7 +138,7 @@ module.exports = {
 
       if (userData_day_index === -1) {
         threadData.day.push({
-          id: senderID,
+          id: event.senderID,
           count: 1
         });
       } else {
@@ -147,7 +147,7 @@ module.exports = {
 
       if (userData_month_index === -1) {
         threadData.month.push({
-          id: senderID,
+          id: event.senderID,
           count: 1
         });
       } else {
@@ -161,7 +161,7 @@ module.exports = {
         ['day', 'week', 'month', 'total'].forEach(t => threadData[t] = threadData[t].filter($ => p.includes($.id + '')));
       }
 
-      fs.writeFileSync(path + threadID + '.json', JSON.stringify(threadData, null, 4));
+      fs.writeFileSync(path + event.threadID + '.json', JSON.stringify(threadData, null, 4));
     } catch (error) {
       console.error('Error in execute function:', error);
     }

@@ -7,8 +7,8 @@ module.exports = {
     access: 1,
     wait: 3,
     desc: "restart chatbot",
-    async execute({ api, threadID }) {
-      return api.sendMessage(`✅`, threadID, () => process.exit(1));
+    async execute({ api, event }) {
+      return api.sendMessage(`✅`, event.threadID, () => process.exit(1));
     }
   };
   

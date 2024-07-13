@@ -101,12 +101,10 @@ function handleMQTTEvents(api) {
             return;
         }
         try {
-            const { body, threadID, senderID, messageID } = event;
-            const userInfo = await api.getUserInfo(senderID);
-            const senderName = userInfo[senderID]?.name || 'Người Dùng';
+
             const { PREFIX = '!', ADMIN_UID } = process.env;
 
-            if (!body) {
+            if (!event.body) {
                 return;
             }
 
@@ -114,13 +112,13 @@ function handleMQTTEvents(api) {
             let args = [];
             let hasPrefix = false;
 
-            if (body.startsWith(PREFIX)) {
+            if (event.body.startsWith(PREFIX)) {
                 hasPrefix = true;
-                args = body.slice(PREFIX.length).trim().split(' ');
+                args = event.body.slice(PREFIX.length).trim().split(' ');
                 command = args.shift().toLowerCase();
             } else {
-                command = body.trim().split(' ')[0].toLowerCase();
-                args = body.trim().split(' ').slice(1);
+                command = event.body.trim().split(' ')[0].toLowerCase();
+                args = event.body.trim().split(' ').slice(1);
             }
 
             const commandModule = commandMap.get(command);
@@ -129,39 +127,39 @@ function handleMQTTEvents(api) {
                     return;
                 }
                 if (commandModule.wait) {
-                    if (!cooldowns.has(senderID)) {
-                        cooldowns.set(senderID, new Map());
+                    if (!cooldowns.has(event.senderID)) {
+                        cooldowns.set(event.senderID, new Map());
                     }
-                    const userCooldowns = cooldowns.get(senderID);
+                    const userCooldowns = cooldowns.get(event.senderID);
                     if (userCooldowns.has(commandModule.name)) {
                         const expirationTime = userCooldowns.get(commandModule.name);
                         const currentTime = Date.now();
                         if (currentTime < expirationTime) {
                             const timeLeft = (expirationTime - currentTime) / 1000;
-                            api.sendMessage(`❌ Bạn đã sử dụng lệnh quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, threadID);
+                            api.sendMessage(`❌ Bạn đã sử dụng lệnh quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, event.threadID);
                             return;
                         }
                     }
                     const waitTime = commandModule.wait * 1000;
                     userCooldowns.set(commandModule.name, Date.now() + waitTime);
                 }
-                if (commandModule.access === 1 && senderID !== ADMIN_UID) {
-                    api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', threadID);
+                if (commandModule.access === 1 && event.senderID !== ADMIN_UID) {
+                    api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', event.threadID);
                     return;
                 }
-                await commandModule.execute({ api, event, args, commands, events, senderName, body, senderID, threadID, messageID, reload: reloadCommandsAndEvents });
+                await commandModule.execute({ api, event, args, commands, events, reload: reloadCommandsAndEvents });
             } else {
                 if (hasPrefix) {
                     const fallbackCommand = commandMap.get('\n');
                     if (fallbackCommand) {
-                        await fallbackCommand.execute({ api, threadID, messageID });
+                        await fallbackCommand.execute({ api, event });
                     }
                 }
             }
 
             for (const eventModule of events) {
                 try {
-                    await eventModule.execute({ api, event, args, commands, events, senderName, body, senderID, threadID, messageID, reload: reloadCommandsAndEvents });
+                    await eventModule.execute({ api, event, args, commands, events, reload: reloadCommandsAndEvents });
                 } catch (err) {
                     console.error(`Lỗi khi xử lý sự kiện (${eventModule.name}):`, err);
                 }

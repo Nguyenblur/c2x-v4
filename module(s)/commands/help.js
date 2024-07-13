@@ -7,7 +7,7 @@ module.exports = {
   access: 0,
   wait: 5,
   desc: 'Hiển thị danh sách lệnh hoặc chi tiết một lệnh.',
-  execute: ({ api, commands, events, threadID, args }) => {
+  execute: ({ api, event, commands, events, args }) => {
     const categories = {};
 
     commands.forEach(cmd => {
@@ -31,17 +31,17 @@ module.exports = {
       });
       let totalCommands = Object.values(categories).reduce((acc, curr) => acc + curr.length, 0);
       helpMessage += `🚀 hiện có ${totalCommands} lệnh.\n🔥 hiện có ${events.length} sự kiện.`;
-      api.sendMessage(helpMessage, threadID);
+      api.sendMessage(helpMessage, event.threadID);
     } else {
       const commandName = args[0].toLowerCase();
       const command = commands.find(cmd => cmd.name === commandName);
 
       if (!command) {
-        api.sendMessage(`Không tìm thấy lệnh có tên "${commandName}".`, threadID);
+        api.sendMessage(`Không tìm thấy lệnh có tên "${commandName}".`, event.threadID);
       } else {
         let accessLevel = command.access === 1 ? "Quản trị viên" : "Thành viên";
         let commandMessage = `🌟 Tên lệnh: ${command.name.toUpperCase()}\n📝 Phiên bản: ${command.version}\n👤 Quyền Hạn: ${accessLevel}\n🧪 Credit: ${command.author}\n✏ Mô Tả: ${command.desc}\n📎 Thể loại: ${command.category}\n⏳ Thời gian chờ: ${command.wait}s`;
-        api.sendMessage(commandMessage, threadID);
+        api.sendMessage(commandMessage, event.threadID);
       }
     }
   }

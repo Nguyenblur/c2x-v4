@@ -8,7 +8,7 @@ module.exports = {
     access: 1,
     wait: 3,
     desc: "read/write/cre/edit/rm/rename",
-    async execute({ api, args, threadID, body }) {
+    async execute({ api, args, event }) {
       if (args.length === 0) {
         const huongDanSuDung = `
           Cách Sử Dụng:
@@ -18,13 +18,13 @@ module.exports = {
           - Để xóa một tệp: \`!file rm <tên_tệp>\`
           - Để đổi tên một tệp: \`!file rename <tên_cũ> <tên_mới>\`
         `;
-        return api.sendMessage(huongDanSuDung, threadID);
+        return api.sendMessage(huongDanSuDung, event.threadID);
       }
       var path = __dirname + "/";
       if (args[0] == "edit") {
-        var newCode = body.slice(
+        var newCode = event.body.slice(
           8 + args[1].length + args[0].length,
-          body.length,
+          event.body.length,
         );
         fs.writeFile(
           `${__dirname}/${args[1]}.js`,
@@ -37,7 +37,7 @@ module.exports = {
               );
             api.sendMessage(
               `Đã áp dụng code mới cho "${args[1]}.js".`,
-              threadID,
+              event.threadID,
             );
           },
         );
@@ -49,9 +49,9 @@ module.exports = {
             if (err)
               return api.sendMessage(
                 `Đã xảy ra lỗi khi đọc lệnh "${args[1]}.js".`,
-                threadID
+                event.threadID
               );
-            api.sendMessage(data, threadID);
+            api.sendMessage(data, event.threadID);
           },
         );
       } else if (args[0] == "-r") {
@@ -62,18 +62,18 @@ module.exports = {
             if (err)
               return api.sendMessage(
                 `Đã xảy ra lỗi khi đọc lệnh "${args[1]}.js".`,
-                threadID
+                event.threadID
               );
-            api.sendMessage(data, threadID);
+            api.sendMessage(data, event.threadID);
           },
         );
       } else if (args[0] == "cre") {
         if (args[1].length == 0)
-          return api.sendMessage("Chưa đặt tên cho modules", threadID);
+          return api.sendMessage("Chưa đặt tên cho modules", event.threadID);
         if (fs.existsSync(`${__dirname}/${args[1]}.js`))
           return api.sendMessage(
             `${args[1]}.js đã tồn tại.`,
-            threadID
+            event.threadID
           );
         fs.copyFileSync(
           __dirname + "/ping.js",
@@ -81,13 +81,13 @@ module.exports = {
         );
         return api.sendMessage(
           `Đã tạo thành công tệp "${args[1]}.js".`,
-          threadID
+          event.threadID
         );
       } else if (args[0] == "rm") {
         fs.unlinkSync(`${__dirname}/${args[1]}.js`);
         return api.sendMessage(
           `Đã xoá file có tên "${args[1]}.js".`,
-          threadID
+          event.threadID
         );
       } else if (args[0] == "rename") {
         fs.rename(
@@ -97,7 +97,7 @@ module.exports = {
             if (err) throw err;
             return api.sendMessage(
               `Đã đổi tên thành công tệp "${args[1]}.js" thành "${args[2]}.js".`,
-              threadID
+              event.threadID
             );
           },
         );

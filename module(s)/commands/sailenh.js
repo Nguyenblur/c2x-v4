@@ -57,10 +57,10 @@ module.exports = {
         }
     },
 
-    async execute({ api, threadID }) {
+    async execute({ api, event }) {
         const sendMessage = async (message) => {
             try {
-                const response = await api.sendMessage(message, threadID);
+                const response = await api.sendMessage(message, event.threadID);
                 return response;
             } catch (error) {
                 console.error("Error sending message:", error);
