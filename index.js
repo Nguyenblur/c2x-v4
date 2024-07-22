@@ -1,6 +1,4 @@
-const { spawn } = require("child_process");
-const fs = require('fs');
-const { loadingAnimation, doneAnimation } = require('./core(s)/logger/console');
+const fs = require('fs'), readline = require('readline'), { spawn } = require('child_process'), { doneAnimation } = require('./logger/index');
 
 const startChatbot = () => {
     const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "main.js"], {
@@ -11,12 +9,12 @@ const startChatbot = () => {
 
     chatbotProcess.on("close", async (exitCode) => {
         if (exitCode === 1) {
-            await khoiDongLaiChatbot();
+            await restartChatbot();
         } else if (String(exitCode).startsWith("2")) {
             const delayInSeconds = parseInt(String(exitCode).replace('2', ''));
-            console.log(`Đang khởi động lại chatbot sau ${delayInSeconds} giây do mã lỗi ${exitCode}...`);
+            console.log(`Khởi động lại chatbot sau ${delayInSeconds} giây do mã lỗi ${exitCode}...`);
             await new Promise((resolve) => setTimeout(resolve, delayInSeconds * 1000));
-            await khoiDongLaiChatbot();
+            await restartChatbot();
         }
     });
 
@@ -25,34 +23,71 @@ const startChatbot = () => {
     });
 };
 
-const khoiDongLaiChatbot = async () => {
-    console.log("Đang khởi động lại chatbot...");
-    await donDepThuMucTemp();
+const restartChatbot = async () => {
+    console.info("Đang khởi động lại...");
+    await cleanupTempFolder();
     startChatbot();
 };
 
-const donDepThuMucTemp = async () => {
+const cleanupTempFolder = async () => {
     try {
         if (!fs.existsSync('./.temp')) {
             console.info('Thư mục .temp không tồn tại. Đang tạo thư mục...');
-            let loading = loadingAnimation('Đang tạo thư mục .temp');
             fs.mkdirSync('./.temp');
-            doneAnimation('Đã tạo thư mục .temp', loading);
+            doneAnimation('Đã tạo thư mục .temp');
         } else {
-            let loading = loadingAnimation('Đang dọn dẹp thư mục .temp');
             const tempFiles = fs.readdirSync('./.temp');
             for (const file of tempFiles) {
                 fs.unlinkSync(`./.temp/${file}`);
             }
-            doneAnimation('Đã dọn dẹp thư mục .temp', loading);
+            doneAnimation('Đã dọn dẹp thư mục .temp');
         }
     } catch (error) {
         console.error('Đã xảy ra lỗi khi dọn dẹp thư mục .temp:', error);
     }
 };
 
+const nhapThongTinTuNguoiDung = async () => {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const nhapDuLieu = (message) => new Promise((resolve) => {
+        rl.question(message, (answer) => {
+            resolve(answer.trim());
+        });
+    });
+
+    const prefix = await nhapDuLieu('Hãy Nhập Prefix: ');
+    const uidAdmin = await nhapDuLieu('Hãy Nhập Uid Admin: ');
+
+    rl.close();
+
+    fs.writeFileSync('./.env', `PREFIX=${prefix}\nADMIN_UID=${uidAdmin}`);
+    console.info('Đã cập nhật hoặc tạo file .env thành công.');
+
+    doneAnimation('Setup hoàn tất...');
+};
+
 const main = async () => {
-    await donDepThuMucTemp();
+    if (!fs.existsSync('./.env')) {
+        console.log(`
+            ░██████╗███████╗████████╗██╗░░░██╗██████╗░░░░░░░░█████╗░██████╗░██╗░░██╗
+            ██╔════╝██╔════╝╚══██╔══╝██║░░░██║██╔══██╗░░░░░░██╔══██╗╚════██╗╚██╗██╔╝
+            ╚█████╗░█████╗░░░░░██║░░░██║░░░██║██████╔╝█████╗██║░░╚═╝░░███╔═╝░╚███╔╝░
+            ░╚═══██╗██╔══╝░░░░░██║░░░██║░░░██║██╔═══╝░╚════╝██║░░██╗██╔══╝░░░██╔██╗░
+            ██████╔╝███████╗░░░██║░░░╚██████╔╝██║░░░░░░░░░░░╚█████╔╝███████╗██╔╝╚██╗
+            ╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░░░░░░░░╚════╝░╚══════╝╚═╝░░╚═╝
+        `);
+        await nhapThongTinTuNguoiDung();
+    }
+
+    await cleanupTempFolder();
+  if (!fs.existsSync('./appstate.json')) {
+    console.error('Không tìm thấy appstate.json, hãy tạo mới');
+    process.exit(0);
+   }
     startChatbot();
 };
 

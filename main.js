@@ -1,12 +1,20 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
-const login = require('./core(s)/login');
-const { doneAnimation, errAnimation } = require('./core(s)/logger/console');
-require('dotenv').config();
+const login = require('fca-c2x');
+const { doneAnimation, errAnimation } = require('./logger/index');
+const { UserInThreadData, getUser, getThread, money } = require('./app/index');
 
-const commandsDir = path.join(__dirname, './module(s)/commands'), eventsDir = path.join(__dirname, './module(s)/events');
-let commands = [], events = [], mqttListener = null;
-const cooldowns = new Map(), commandMap = new Map(), eventMap = new Map();
+const commandsDir = path.join(__dirname, './modules/commands'), eventsDir = path.join(__dirname, './modules/events');
+
+const client = {
+   commands: [],
+   events: [],
+   commandMap: new Map(),
+   eventMap: new Map(),
+   cooldowns: new Map(),
+   mqttListener: null,
+   config: process.env
+};
 
 async function startBot() {
     try {
@@ -15,7 +23,7 @@ async function startBot() {
             process.exit(0);
         }
         login(
-            { appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) },
+            { appState: JSON.parse(fs.readFileSync("appstate.json", "utf8")) },
             {
                 listenEvents: true,
                 autoMarkDelivery: false,
@@ -35,13 +43,13 @@ async function startBot() {
                     return;
                 }
                 doneAnimation('Đã kết nối thành công.');
+                doneAnimation('successfully initialize and connect to the database');
                 const userId = api.getCurrentUserID();
                 const user = await api.getUserInfo([userId]);
-                api.getCurrentUserName = () => user[userId]?.name;
                 console.info(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
-                commands = loadCommands(api);
-                events = loadEvents(api);
-                startMQTTListener(api);
+                client.commands = loadCommands(api);
+                client.events = loadEvents(api);
+                startmqttListener(api);
             }
         );
     } catch (err) {
@@ -52,8 +60,8 @@ async function startBot() {
 
 function reloadCommandsAndEvents(api) {
     clearCommandsAndEvents();
-    commands = loadCommands(api);
-    events = loadEvents(api);
+    client.commands = loadCommands(api);
+    client.events = loadEvents(api);
 }
 
 function loadCommands(api) {
@@ -61,9 +69,9 @@ function loadCommands(api) {
     const commands = commandFiles.map(file => {
         const commandModule = require(path.join(commandsDir, file));
         if (commandModule && commandModule.name) {
-            commandMap.set(commandModule.name.toLowerCase(), commandModule);
+            client.commandMap.set(commandModule.name.toLowerCase(), commandModule);
             if (commandModule.onLoad) {
-                commandModule.onLoad({ api });
+                commandModule.onLoad({ client, api });
             }
             return commandModule;
         } else {
@@ -80,9 +88,9 @@ function loadEvents(api) {
     const events = eventFiles.map(file => {
         const eventModule = require(path.join(eventsDir, file));
         if (eventModule && eventModule.name) {
-            eventMap.set(eventModule.name.toLowerCase(), eventModule);
+            client.eventMap.set(eventModule.name.toLowerCase(), eventModule);
             if (eventModule.onLoad) {
-                eventModule.onLoad({ api });
+                eventModule.onLoad({ client, api });
             }
             return eventModule;
         } else {
@@ -95,16 +103,65 @@ function loadEvents(api) {
 }
 
 function handleMQTTEvents(api) {
-    mqttListener = api.listenMqtt(async (err, event) => {
+    client.mqttListener = api.listenMqtt(async (err, message) => {
         if (err) {
             console.error(err);
             return;
         }
+
+        if (message.type == "message" || message.type == "message_reply") {
+            message.user = (await api.getUserInfo(message.senderID))[message.senderID];
+            message.thread = await api.getThreadInfo(message.threadID);
+            message.react = (content) => {
+                return new Promise((resolve, reject) => {
+                    api.setMessageReaction(content, message.messageID, (err, message) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(message);
+                        }
+                    }, () => {}, true);
+                });
+            };
+            message.reply = (content, targetID) => {
+                return new Promise((resolve, reject) => {
+                    api.sendMessage(content, targetID, (err, message) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(message);
+                        }
+                    }, message.messageID);
+                });
+            };
+            message.send = (content, targetID) => {
+                return new Promise((resolve, reject) => {
+                    api.sendMessage(content, targetID, (err, message) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(message);
+                        }
+                    });
+                });
+            };
+        }
+
+        UserInThreadData(message);
+   
         try {
 
-            const { PREFIX = '!', ADMIN_UID } = process.env;
+            for (const module of [...client.commands,...client.events]) {
+                try {
+                  if (module.onMessage) {
+                    await module.onMessage({ client, api, message, user: getUser, thread: getThread, money });
+                  }
+                } catch (err) {
+                  console.error(`Error handling message (${module.name}):`, err);
+                }
+              }
 
-            if (!event.body) {
+            if (!message.body) {
                 return;
             }
 
@@ -112,56 +169,48 @@ function handleMQTTEvents(api) {
             let args = [];
             let hasPrefix = false;
 
-            if (event.body.startsWith(PREFIX)) {
+            if (message.body.startsWith(client.config.PREFIX)) {
                 hasPrefix = true;
-                args = event.body.slice(PREFIX.length).trim().split(' ');
+                args = message.body.slice(client.config.PREFIX.length).trim().split(' ');
                 command = args.shift().toLowerCase();
             } else {
-                command = event.body.trim().split(' ')[0].toLowerCase();
-                args = event.body.trim().split(' ').slice(1);
+                command = message.body.trim().split(' ')[0].toLowerCase();
+                args = message.body.trim().split(' ').slice(1);
             }
 
-            const commandModule = commandMap.get(command);
-            if (commandModule) {
+            const commandModule = client.commandMap.get(command);
+              if (commandModule) {
                 if (!commandModule.nopre && !hasPrefix) {
                     return;
                 }
                 if (commandModule.wait) {
-                    if (!cooldowns.has(event.senderID)) {
-                        cooldowns.set(event.senderID, new Map());
+                    if (!client.cooldowns.has(message.senderID)) {
+                        client.cooldowns.set(message.senderID, new Map());
                     }
-                    const userCooldowns = cooldowns.get(event.senderID);
+                    const userCooldowns = client.cooldowns.get(message.senderID);
                     if (userCooldowns.has(commandModule.name)) {
                         const expirationTime = userCooldowns.get(commandModule.name);
                         const currentTime = Date.now();
                         if (currentTime < expirationTime) {
                             const timeLeft = (expirationTime - currentTime) / 1000;
-                            api.sendMessage(`❌ Bạn đã sử dụng lệnh quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, event.threadID);
+                            api.sendMessage(`❌ Bạn đã sử dụng lệnh quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, message.threadID);
                             return;
                         }
                     }
                     const waitTime = commandModule.wait * 1000;
                     userCooldowns.set(commandModule.name, Date.now() + waitTime);
                 }
-                if (commandModule.access === 1 && event.senderID !== ADMIN_UID) {
-                    api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', event.threadID);
+                if (commandModule.admin && message.senderID !== client.config.ADMIN_UID) {
+                    api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
                     return;
                 }
-                await commandModule.execute({ api, event, args, commands, events, reload: reloadCommandsAndEvents });
+                await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, money, reload: reloadCommandsAndEvents });
             } else {
                 if (hasPrefix) {
-                    const fallbackCommand = commandMap.get('\n');
+                    const fallbackCommand = client.commandMap.get('\n');
                     if (fallbackCommand) {
-                        await fallbackCommand.execute({ api, event });
+                        await fallbackCommand.onCall({ api, message });
                     }
-                }
-            }
-
-            for (const eventModule of events) {
-                try {
-                    await eventModule.execute({ api, event, args, commands, events, reload: reloadCommandsAndEvents });
-                } catch (err) {
-                    console.error(`Lỗi khi xử lý sự kiện (${eventModule.name}):`, err);
                 }
             }
         } catch (err) {
@@ -170,15 +219,15 @@ function handleMQTTEvents(api) {
     });
 }
 
-function startMQTTListener(api) {
-    if (mqttListener) {
-        mqttListener.stopListening();
+function startmqttListener(api) {
+    if (client.mqttListener) {
+        client.mqttListener.stopListening();
     }
     handleMQTTEvents(api);
     setInterval(() => {
         console.log('Reloading MQTT listener...');
-        if (mqttListener) {
-            mqttListener.stopListening();
+        if (client.mqttListener) {
+            client.mqttListener.stopListening();
         }
         handleMQTTEvents(api);
     }, 2 * 60 * 60 * 1000); 
@@ -199,9 +248,9 @@ function clearCommandsAndEvents() {
         }
     });
 
-    commandMap.clear();
-    eventMap.clear();
-    cooldowns.clear();
+    client.commandMap.clear();
+    client.eventMap.clear();
+    client.cooldowns.clear();
 }
 
 startBot();

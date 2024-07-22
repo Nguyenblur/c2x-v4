@@ -4,24 +4,22 @@
 		"description": "BOT MESSAGER NODEJS",
 		"main": "main.js",
 		"scripts": {
-				"start": "node index"
+				"start": "node --env-file .env index.js"
 		},
 		"author": "Nguyên Blue",
 		"license": "GPL-3.0",
 		"dependencies": {
 				"axios": "^1.7.2",
-				"bluebird": "^2.11.0",
-				"cheerio": "^1.0.0-rc.10",
 				"child_process": "",
-				"dotenv": "^16.4.5",
+				"crypto": "^1.0.1",
+				"fca-c2x": "github:nguyenblur/fca-c2x",
 				"fs": "^0.0.1-security",
-				"fs-extra": "",
-				"https-proxy-agent": "^4.0.0",
 				"moment-timezone": "",
-				"mqtt": "^4.2.8",
-				"npmlog": "^1.2.0",
-				"path": "",
+				"node-cache": "^5.1.2",
+				"uuid": "*",
+				"path": "*",
 				"request": "^2.53.0",
-				"websocket-stream": "^5.5.0"
+				"sequelize": "^6.37.3",
+				"sqlite3": "^5.1.7"
 		}
 }
