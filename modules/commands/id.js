@@ -2,7 +2,7 @@ const axios = require ('axios');
 const regex = "https?://(www\.)?facebook\.com/.*";
 module.exports = {
     name: "id",
-    author: "Nguyên Blue", // convert từ dino bot: duy anh
+    author: "Duy anh • Nguyên Blue [convert]",
     category: "TOOLS",
     version: "1.0",
     nopre: false,
@@ -28,7 +28,7 @@ module.exports = {
           let data = res.data;
           if (data.uid && data.uid != "") msg.push(`Id từ link của tin nhắn trả lời: ${data.uid}`);
         }
-        msg.push("Id ngưởi gửi tin nhắn được trả lời: " + message.messageReply.message.senderID);
+        msg.push("Id ngưởi gửi tin nhắn được trả lời: " + message.messageReply.senderID);
         msg.push("Id tin nhắn được trả lời: " + message.messageReply.messageID);
       }
       if (message.isGroup) {
