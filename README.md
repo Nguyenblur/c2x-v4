@@ -1,4 +1,4 @@
-dự án vẫn đang phát triển, update liên tục, và nhận góp ý từ cộng đồng, liên hệ với https://www.facebook.com/wionp nếu bạn cần hỗ trợ!
+dự án vẫn đang phát triển, update liên tục, và nhận góp ý từ cộng đồng, liên hệ với https://www.facebook.com/wionp nếu bạn cần hỗ trợ! nhớ install phiên bản nodejs trên v20.6.0 nhé
 # A Simple Facebook Messenger Bot using Node.js
 
 <p align="center">
