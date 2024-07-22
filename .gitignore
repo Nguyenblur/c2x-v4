@@ -10,5 +10,6 @@ pnpm-lock.yaml
 .git
 log
 appstate.json
-core(s)/database/money.json
-core(s)/database/checktt
+db/data/data.sqlite
+db/data/daily.json
+db/data/checktt
