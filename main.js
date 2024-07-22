@@ -201,7 +201,7 @@ function handleMQTTEvents(api) {
                             if (!userCooldowns.get(`${commandName}_notified`)) {
                                 const timeLeft = (expirationTime - currentTime) / 1000;
                                 api.sendMessage(`❌ Bạn đã sử dụng lệnh '${commandName}' quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, message.threadID);
-                                userCooldowns.set(`${commandName}_notified`, true); // Đánh dấu đã gửi thông báo
+                                userCooldowns.set(`${commandName}_notified`, true); 
                             }
                             return;
                         }
@@ -210,7 +210,7 @@ function handleMQTTEvents(api) {
                     const waitTime = commandModule.wait * 1000;
                     const expirationTime = Date.now() + waitTime;
                     userCooldowns.set(commandName, expirationTime);
-                    userCooldowns.delete(`${commandName}_notified`); // Xóa đánh dấu thông báo để chuẩn bị cho lần sử dụng tiếp theo
+                    userCooldowns.delete(`${commandName}_notified`); 
                 }                              
                 if (commandModule.admin && message.senderID !== client.config.ADMIN_UID) {
                     api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
