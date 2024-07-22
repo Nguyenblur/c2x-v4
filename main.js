@@ -184,22 +184,34 @@ function handleMQTTEvents(api) {
                     return;
                 }
                 if (commandModule.wait) {
-                    if (!client.cooldowns.has(message.senderID)) {
-                        client.cooldowns.set(message.senderID, new Map());
+                    const userId = message.senderID;
+                    const commandName = commandModule.name;
+                
+                    if (!client.cooldowns.has(userId)) {
+                        client.cooldowns.set(userId, new Map());
                     }
-                    const userCooldowns = client.cooldowns.get(message.senderID);
-                    if (userCooldowns.has(commandModule.name)) {
-                        const expirationTime = userCooldowns.get(commandModule.name);
+                    
+                    const userCooldowns = client.cooldowns.get(userId);
+                
+                    if (userCooldowns.has(commandName)) {
+                        const expirationTime = userCooldowns.get(commandName);
                         const currentTime = Date.now();
+                        
                         if (currentTime < expirationTime) {
-                            const timeLeft = (expirationTime - currentTime) / 1000;
-                            api.sendMessage(`❌ Bạn đã sử dụng lệnh quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, message.threadID);
+                            if (!userCooldowns.get(`${commandName}_notified`)) {
+                                const timeLeft = (expirationTime - currentTime) / 1000;
+                                api.sendMessage(`❌ Bạn đã sử dụng lệnh '${commandName}' quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, message.threadID);
+                                userCooldowns.set(`${commandName}_notified`, true); // Đánh dấu đã gửi thông báo
+                            }
                             return;
                         }
                     }
+                
                     const waitTime = commandModule.wait * 1000;
-                    userCooldowns.set(commandModule.name, Date.now() + waitTime);
-                }
+                    const expirationTime = Date.now() + waitTime;
+                    userCooldowns.set(commandName, expirationTime);
+                    userCooldowns.delete(`${commandName}_notified`); // Xóa đánh dấu thông báo để chuẩn bị cho lần sử dụng tiếp theo
+                }                              
                 if (commandModule.admin && message.senderID !== client.config.ADMIN_UID) {
                     api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
                     return;
