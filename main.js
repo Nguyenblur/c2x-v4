@@ -13,8 +13,16 @@ const client = {
    eventMap: new Map(),
    cooldowns: new Map(),
    mqttListener: null,
-   config: process.env
+   config: {}
 };
+
+fs.readFile('./config.json', 'utf8', (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      Object.assign(client.config, JSON.parse(data));
+    }
+});
 
 async function startBot() {
     try {
@@ -69,7 +77,14 @@ function loadCommands(api) {
     const commands = commandFiles.map(file => {
         const commandModule = require(path.join(commandsDir, file));
         if (commandModule && commandModule.name) {
-            client.commandMap.set(commandModule.name.toLowerCase(), commandModule);
+             client.commandMap.set(commandModule.name.toLowerCase(), commandModule);
+            
+            if (commandModule.alias && Array.isArray(commandModule.alias)) {
+                commandModule.alias.forEach(aliases => {
+                    client.commandMap.set(aliases.toLowerCase(), commandModule);
+                });
+            }
+            
             if (commandModule.onLoad) {
                 commandModule.onLoad({ client, api });
             }
@@ -82,6 +97,7 @@ function loadCommands(api) {
     console.info(`Successfully loaded ${commands.length} command(s)`);
     return commands;
 }
+
 
 function loadEvents(api) {
     const eventFiles = fs.readdirSync(eventsDir).filter(file => file.endsWith('.js'));
@@ -212,10 +228,10 @@ function handleMQTTEvents(api) {
                     userCooldowns.set(commandName, expirationTime);
                     userCooldowns.delete(`${commandName}_notified`); 
                 }                              
-                if (commandModule.admin && message.senderID !== client.config.ADMIN_UID) {
+                if (commandModule.admin && !client.config.UID_ADMIN.includes(message.senderID)) {
                     api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
                     return;
-                }
+                  }
                 await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, money, reload: reloadCommandsAndEvents });
             } else {
                 if (hasPrefix) {

@@ -1,7 +1,7 @@
 const fs = require('fs'), readline = require('readline'), { spawn } = require('child_process'), { doneAnimation } = require('./logger/index');
 
 const startChatbot = () => {
-    const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "--env-file .env", "main.js"], {
+    const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "main.js"], {
         cwd: __dirname,
         stdio: "inherit",
         shell: true
@@ -64,14 +64,14 @@ const nhapThongTinTuNguoiDung = async () => {
 
     rl.close();
 
-    fs.writeFileSync('./.env', `PREFIX=${prefix}\nADMIN_UID=${uidAdmin}`);
+    fs.writeFileSync('./config.json', `{\n"PREFIX": "${prefix}",\n"UID_ADMIN": ["${uidAdmin}"]\n}`);
     console.info('Đã cập nhật hoặc tạo file .env thành công.');
 
     doneAnimation('Setup hoàn tất...');
 };
 
 const main = async () => {
-    if (!fs.existsSync('./.env')) {
+    if (!fs.existsSync('./config.json')) {
         console.log(`
             ░██████╗███████╗████████╗██╗░░░██╗██████╗░░░░░░░░█████╗░██████╗░██╗░░██╗
             ██╔════╝██╔════╝╚══██╔══╝██║░░░██║██╔══██╗░░░░░░██╔══██╗╚════██╗╚██╗██╔╝
