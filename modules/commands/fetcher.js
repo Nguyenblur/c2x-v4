@@ -1,4 +1,4 @@
-const axios = require('axios');
+﻿const axios = require('axios');
 const fs = require('fs');
 
 let globalVar = [];
@@ -52,7 +52,7 @@ async function processVideo(url, api) {
         const metadata = JSON.parse(uploadResponse.body.replace('for (;;);', '')).payload?.metadata?.[0] || {};
         return Object.entries(metadata)[0];
     } catch (error) {
-        console.error("Error processing video:", error);
+        // console.error("Error processing video:", error);
         throw error;
     }
 }
@@ -68,7 +68,7 @@ async function fetchAndProcessData(api) {
             globalVar.push(videoMetadata);
         }
     } catch (error) {
-        console.error("Error processing TikTok data:", error);
+       // console.error("Error processing TikTok data:", error);
     }
 }
 
