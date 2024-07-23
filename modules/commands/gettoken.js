@@ -22,7 +22,6 @@ const validTokenTypes = [
 
 module.exports = {
   name: "gettoken",
-  alias: [''],
   author: "Nguyên Blue",
   category: "TOOLS",
   version: "1.0",
