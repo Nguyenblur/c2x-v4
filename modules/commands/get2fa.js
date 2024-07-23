@@ -2,6 +2,7 @@ const GoogleAuthenticator = require('../../app/google/Authenticator');
 
 module.exports = {
     name: "get2fa",
+    alias: [''],
     author: "Nguyên Blue",
     category: "TOOLS",
     version: "1.0",

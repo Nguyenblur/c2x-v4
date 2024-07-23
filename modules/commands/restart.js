@@ -1,5 +1,6 @@
 module.exports = {
   name: "restart",
+  alias: ['rs'],
   author: "Nguyên Blue",
   category: "SYSTEMS",
   version: "1.0",

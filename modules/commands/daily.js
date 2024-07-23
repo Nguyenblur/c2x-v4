@@ -40,6 +40,7 @@ function setLastReceivedTime(userId, time) {
 
 module.exports = {
     name: "daily",
+    alias: ['work'],
     author: "Nguyên Blue",
     category: "SYSTEMS",
     version: "1.0",

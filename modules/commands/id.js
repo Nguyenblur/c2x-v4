@@ -2,6 +2,7 @@ const axios = require ('axios');
 const regex = "https?://(www\.)?facebook\.com/.*";
 module.exports = {
     name: "id",
+    alias: ['uid', 'tid'],
     author: "Duy anh • Nguyên Blue [convert]",
     category: "TOOLS",
     version: "1.0",

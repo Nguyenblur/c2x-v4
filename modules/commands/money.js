@@ -1,5 +1,6 @@
 module.exports = {
     name: "money",
+    alias: [''],
     author: "Nguyên Blue",
     category: "SYSTEMS",
     version: "1.0",

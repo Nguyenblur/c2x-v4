@@ -1,5 +1,6 @@
 module.exports = {
   name: "reload",
+  alias: ['rl'],
   author: "Nguyên Blue",
   category: "SYSTEMS",
   version: "1.0",

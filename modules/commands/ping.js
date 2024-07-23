@@ -1,5 +1,6 @@
 module.exports = {
   name: "ping",
+  alias: ['pong'],
   author: "Nguyên Blue",
   category: "SYSTEMS",
   version: "1.0",

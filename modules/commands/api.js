@@ -24,6 +24,7 @@ function writeJsonFile(data) {
 
 module.exports = {
     name: "api",
+    alias: ['json'],
     author: "Nguyên Blue",
     category: "SYSTEMS",
     version: "1.0",

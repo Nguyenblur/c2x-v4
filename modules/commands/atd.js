@@ -27,6 +27,7 @@ function formatted(number) {
 
 module.exports = {
     name: "atd",
+    alias: ['autodown'],
     author: "Nguyên Blue",
     category: "SYSTEMS",
     version: "1.0",
