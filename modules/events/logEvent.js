@@ -9,10 +9,10 @@ module.exports = {
   desc: "Ghi log tương tác thành viên của nhóm.",
   async onMessage({ message }) {
     try {
-      if (!message.isGroup) return;
-
-      const today = moment.tz("Asia/Ho_Chi_Minh").day();
-      const thisMonth = moment.tz("Asia/Ho_Chi_Minh").month();
+      if (!message.isGroup && message.logMessageType !== 'log:subscribe') return;
+      const today = moment.tz("Asia/Ho_Chi_Minh");
+      const dayOfWeek = today.day();
+      const thisMonth = today.month();
 
       if (!fs.existsSync(path + message.threadID + '.json')) {
         const newObj = {
@@ -20,38 +20,58 @@ module.exports = {
           week: [],
           day: [],
           month: [],
-          time: today,
+          time: dayOfWeek, 
           monthTime: thisMonth,
           last: {
-            time: today,
+            time: dayOfWeek,
             day: [],
             week: [],
             month: [],
           },
+          recentInteractions: {},
+          timeToJoinTheGroup: {},
         };
         fs.writeFileSync(path + message.threadID + '.json', JSON.stringify(newObj, null, 4));
       }
 
       let newObj = JSON.parse(fs.readFileSync(path + message.threadID + '.json'));
 
-      if (newObj.time !== today) {
-        newObj.time = today;
-        newObj.day = [];
-        newObj.week = [];
-
-        if (newObj.monthTime !== thisMonth) {
-          newObj.monthTime = thisMonth;
-          newObj.month = [];
+      newObj.timeToJoinTheGroup = newObj.timeToJoinTheGroup || {}; 
+      if (message.logMessageData && message.logMessageData.addedParticipants) {
+        const addedParticipants = message.logMessageData.addedParticipants;
+        if (Array.isArray(addedParticipants)) {
+          addedParticipants.forEach(participant => {
+            const uid = participant.userFbId;
+            if (!uid) return;
+            newObj.timeToJoinTheGroup[uid] = Date.now();
+          });
         }
       }
+      
+      const UserIDs = Array.isArray(message.senderID) ? message.senderID : [message.senderID];
+      newObj.recentInteractions = newObj.recentInteractions || {};
+      UserIDs.forEach(uid => {
+        if (!uid) return;
+        newObj.recentInteractions[uid] = Date.now();
+      });
 
-      if (message.body) { 
+      if (newObj.time !== dayOfWeek || (dayOfWeek === 0 && newObj.week.length === 0)) {
+        newObj.time = dayOfWeek;
+        newObj.week = [];
+      }
+
+      if (newObj.monthTime !== thisMonth) {
+        newObj.monthTime = thisMonth;
+        newObj.month = [];
+      }
+
+      if (message.body) {
         const UserIDs = message.participantIDs || [];
 
         for (const user of UserIDs) {
           if (!newObj.last) {
             newObj.last = {
-              time: today,
+              time: dayOfWeek,
               day: [],
               week: [],
               month: [],
