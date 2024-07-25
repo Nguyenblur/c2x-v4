@@ -48,17 +48,20 @@ const money = (() => {
 async function UserInThreadData(message) {
   try {
     const senderID = message.senderID;
-    if (!senderID) {
+    const threadID = message.threadID;
+
+    if (!senderID || !threadID) {
       return;
     }
 
     let user = await User.findOne({ where: { uid: senderID } });
     const userData = {
-      name: message.user ? message.user.name || "" : "",
+      name: message.user && message.user.name ? message.user.name : "Người Dùng Facebook",
       uid: senderID,
     };
+
     if (!user) {
-      userData.money = 0; 
+      userData.money = 0;
       user = await User.create(userData);
       console.log(`Created new user: ${userData.name} (${userData.uid})`);
     } else if (JSON.stringify(user.toJSON()) !== JSON.stringify(userData)) {
@@ -66,20 +69,17 @@ async function UserInThreadData(message) {
     } else {
       console.log(`User already exists: ${userData.name} (${userData.uid})`);
     }
-    const threadID = message.threadID;
-    if (!threadID) {
-      return;
-    }
 
     let thread = await Thread.findOne({ where: { tid: threadID } });
     const threadData = {
-      name: message.thread? message.thread.name || "" : "",
+      name: message.thread && message.thread.name ? message.thread.name : "Nhóm",
       tid: threadID
     };
+
     if (!thread) {
       thread = await Thread.create(threadData);
       console.log(`Created new thread: ${threadData.name} (${threadData.tid})`);
-    } else if (JSON.stringify(thread.toJSON())!== JSON.stringify(threadData)) {
+    } else if (JSON.stringify(thread.toJSON()) !== JSON.stringify(threadData)) {
       await thread.update(threadData);
     } else {
       console.log(`Thread already exists: ${threadData.name} (${threadData.tid})`);
