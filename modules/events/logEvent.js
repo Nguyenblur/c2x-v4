@@ -53,135 +53,15 @@ module.exports = {
       UserIDs.forEach(uid => {
         if (!uid) return;
         newObj.recentInteractions[uid] = Date.now();
+
+        newObj.total = updateInteractionCount(newObj.total, uid);
+        newObj.week = updateInteractionCount(newObj.week, uid);
+        newObj.day = updateInteractionCount(newObj.day, uid);
+        newObj.month = updateInteractionCount(newObj.month, uid);
       });
-
-      if (newObj.time !== dayOfWeek || (dayOfWeek === 0 && newObj.week.length === 0)) {
-        newObj.time = dayOfWeek;
-        newObj.week = [];
-      }
-
-      if (newObj.monthTime !== thisMonth) {
-        newObj.monthTime = thisMonth;
-        newObj.month = [];
-      }
-
-      if (message.body) {
-        const UserIDs = message.participantIDs || [];
-
-        for (const user of UserIDs) {
-          if (!newObj.last) {
-            newObj.last = {
-              time: dayOfWeek,
-              day: [],
-              week: [],
-              month: [],
-            };
-          }
-
-          if (!newObj.last.week.find(item => item.id === user)) {
-            newObj.last.week.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.last.day.find(item => item.id === user)) {
-            newObj.last.day.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.last.month.find(item => item.id === user)) {
-            newObj.last.month.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.total.find(item => item.id === user)) {
-            newObj.total.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.week.find(item => item.id === user)) {
-            newObj.week.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.day.find(item => item.id === user)) {
-            newObj.day.push({
-              id: user,
-              count: 0
-            });
-          }
-
-          if (!newObj.month.find(item => item.id === user)) {
-            newObj.month.push({
-              id: user,
-              count: 0
-            });
-          }
-        }
-      }
 
       fs.writeFileSync(path + message.threadID + '.json', JSON.stringify(newObj, null, 4));
 
-      const threadData = JSON.parse(fs.readFileSync(path + message.threadID + '.json'));
-
-      const userData_week_index = threadData.week.findIndex(e => e.id === message.senderID);
-      const userData_day_index = threadData.day.findIndex(e => e.id === message.senderID);
-      const userData_month_index = threadData.month.findIndex(e => e.id === message.senderID);
-      const userData_total_index = threadData.total.findIndex(e => e.id === message.senderID);
-
-      if (userData_total_index === -1) {
-        threadData.total.push({
-          id: message.senderID,
-          count: 1,
-        });
-      } else {
-        threadData.total[userData_total_index].count++;
-      }
-
-      if (userData_week_index === -1) {
-        threadData.week.push({
-          id: message.senderID,
-          count: 1
-        });
-      } else {
-        threadData.week[userData_week_index].count++;
-      }
-
-      if (userData_day_index === -1) {
-        threadData.day.push({
-          id: message.senderID,
-          count: 1
-        });
-      } else {
-        threadData.day[userData_day_index].count++;
-      }
-
-      if (userData_month_index === -1) {
-        threadData.month.push({
-          id: message.senderID,
-          count: 1
-        });
-      } else {
-        threadData.month[userData_month_index].count++;
-      }
-
-      let p = message.participantIDs;
-
-      if (!!p && p.length > 0) {
-        p = p.map($ => $ + '');
-        ['day', 'week', 'month', 'total'].forEach(t => threadData[t] = threadData[t].filter($ => p.includes($.id + '')));
-      }
-
-      fs.writeFileSync(path + message.threadID + '.json', JSON.stringify(threadData, null, 4));
     } catch (error) {
       console.error('Error in execute function:', error);
     }
@@ -193,8 +73,9 @@ module.exports = {
     }
 
     setInterval(() => {
-      const today = moment.tz("Asia/Ho_Chi_Minh").day();
-      const thisMonth = moment.tz("Asia/Ho_Chi_Minh").month();
+      const today = moment.tz("Asia/Ho_Chi_Minh");
+      const dayOfWeek = today.day();
+      const thisMonth = today.month();
       const checkttData = fs.readdirSync(path);
 
       checkttData.forEach(file => {
@@ -205,30 +86,31 @@ module.exports = {
           return fs.unlinkSync(path + file);
         }
 
-        if (fileData.time !== today) {
-          setTimeout(() => {
-            try {
-              fileData = JSON.parse(fs.readFileSync(path + file));
-            } catch (error) {
-              console.error('Error reading or parsing file again:', error);
-              return;
-            }
+        if (fileData.time !== dayOfWeek) {
+          fileData.time = dayOfWeek;
+          fileData.day = [];
+          if (dayOfWeek === 0) {
+            fileData.week = [];
+          }
 
-            if (fileData.time !== today) {
-              fileData.time = today;
-              fileData.day = [];
-              fileData.week = [];
+          if (fileData.monthTime !== thisMonth) {
+            fileData.monthTime = thisMonth;
+            fileData.month = [];
+          }
 
-              if (fileData.monthTime !== thisMonth) {
-                fileData.monthTime = thisMonth;
-                fileData.month = [];
-              }
-
-              fs.writeFileSync(path + file, JSON.stringify(fileData, null, 4));
-            }
-          }, 60 * 1000);
+          fs.writeFileSync(path + file, JSON.stringify(fileData, null, 4));
         }
       });
     }, 60 * 1000);
   }
 };
+
+function updateInteractionCount(array, userId) {
+  const existingUser = array.find(item => item.id === userId);
+  if (existingUser) {
+    existingUser.count++;
+  } else {
+    array.push({ id: userId, count: 1 });
+  }
+  return array;
+}
