@@ -100,16 +100,16 @@ module.exports = {
             const threadInfo = await api.getThreadInfo(threadID);
             const adminUIDs = threadInfo.adminIDs;
             const userRole = adminUIDs.includes(userIdToCheck) ? "Quản trị viên" : "Thành viên";
-            const url_profile = `https://www.facebook.com/profile.php?id=${userIdToCheck}`;
             const infoMessage = `[ TỔNG TƯƠNG TÁC CỦA BẠN ]\n\n` +
                                 `👤 Tên: ${userName}\n` +
-                                `🪪 Chức Vụ: ${userRole}\n\n` +
+                                `🪪 Chức Vụ: ${userRole}\n` +
+                                `🔗 Liên Kết: https://www.facebook.com/profile.php?id=${userIdToCheck}\n\n` +
                                 `${interactionInfo}\n` +
                                 `⏱️ Thời gian tương tác gần đây: ${interactionTimeInfo}\n` +
                                 `📆 Thời gian tham gia nhóm: ${joinTimeInfo}\n\n` +
                                 `📌 Thả cảm xúc '❤️' tin nhắn này để xem tổng tin nhắn của toàn bộ thành viên trong nhóm`;
 
-            const info = await api.shareLink(infoMessage, url_profile, threadID);
+            const info = await api.sendMessage(infoMessage, threadID);
             messageCache.set('checktt_Message', info.messageID);
         } catch (error) {
             console.error("Error fetching user info:", error);
