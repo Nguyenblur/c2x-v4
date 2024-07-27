@@ -98,7 +98,7 @@ module.exports = {
 
             const userName = await getUserInfo(api, userIdToCheck);
             const threadInfo = await api.getThreadInfo(threadID);
-            const adminUIDs = threadInfo.adminIDs;
+            const adminUIDs = threadInfo.adminIDs.map(admin => admin.id); 
             const userRole = adminUIDs.includes(userIdToCheck) ? "Quản trị viên" : "Thành viên";
             const infoMessage = `[ TỔNG TƯƠNG TÁC CỦA BẠN ]\n\n` +
                                 `👤 Tên: ${userName}\n` +
@@ -125,29 +125,49 @@ module.exports = {
             const { threadID } = message;
             const filePath = `${path}${threadID}.json`;
             const jsonData = readJsonFile(filePath);
-
+    
             if (!jsonData || !jsonData.total) {
                 return api.sendMessage("Chưa có dữ liệu hoặc dữ liệu không hợp lệ", threadID);
             }
-
+    
             jsonData.total.sort((a, b) => b.count - a.count);
             let totalInteractions = jsonData.total.reduce((total, entry) => total + entry.count, 0);
-            let response = `[ TỔNG TƯƠNG TÁC NHÓM ]\n`;
-
-            for (const entry of jsonData.total) {
+            let response = `[ TỔNG TƯƠNG TÁC NHÓM ]\n\n`;
+    
+            const rankingEmojis = ['🥇', '🥈', '🥉'];
+    
+            for (let i = 0; i < jsonData.total.length; i++) {
+                const entry = jsonData.total[i];
                 try {
                     const userName = await getUserInfo(api, entry.id);
                     const interactionPercentage = calculatePercentage(entry.count, totalInteractions);
-                    response += `${userName}: ${entry.count} (${interactionPercentage}%) \n`;
+                    
+                    const rankEmoji = i < 3 ? rankingEmojis[i] : `${i + 1}.`;
+                    
+                    response += `${rankEmoji} ${userName}: ${entry.count} (${interactionPercentage}%) \n`;
+                    
+                    if (i === 2) break;
                 } catch (error) {
-                    response += `Người Dùng Facebook: ${entry.count}\n`;
+                    response += `${rankingEmojis[i]} Người Dùng Facebook: ${entry.count}\n`;
                 }
             }
-
-            api.sendMessage(response.trim(), message.threadID);
+            
+            for (let i = 3; i < jsonData.total.length; i++) {
+                const entry = jsonData.total[i];
+                try {
+                    const userName = await getUserInfo(api, entry.id);
+                    const interactionPercentage = calculatePercentage(entry.count, totalInteractions);
+                    
+                    response += ` ${i + 1}. ${userName}: ${entry.count} (${interactionPercentage}%) \n`;
+                } catch (error) {
+                    response += ` ${i + 1}. Người Dùng Facebook: ${entry.count}\n`;
+                }
+            }
+    
+            api.sendMessage(response.trim(), threadID);
             messageCache.del('checktt_Message');
         }
-    }
+    }    
 };
 
 function formatInteractionTime(time) {
