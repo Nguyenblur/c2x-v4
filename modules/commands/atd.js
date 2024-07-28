@@ -29,7 +29,7 @@ module.exports = {
     name: "atd",
     alias: ['autodown'],
     author: "Nguyên Blue",
-    category: "SYSTEMS",
+    category: "GROUPS",
     version: "1.0",
     nopre: false,
     admin: true,

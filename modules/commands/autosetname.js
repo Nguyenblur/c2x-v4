@@ -5,7 +5,7 @@ const pathData = './db/data/autosetname.json';
 module.exports = {
   name: "autosetname",
   author: "Nguyên Blue",
-  category: "SYSTEMS",
+  category: "GROUPS",
   version: "1.0",
   nopre: false,
   admin: false,
@@ -27,9 +27,6 @@ module.exports = {
     const content = args.slice(1).join(" ");
 
     try {
-      if (args.length < 1) {
-        throw new Error("Invalid arguments");
-      }
 
       let dataJson = JSON.parse(fs.readFileSync(pathData, "utf-8"));
       let thisThread = dataJson.find(item => item.threadID == threadID) || { threadID, nameUser: [] };

@@ -45,7 +45,7 @@ module.exports = {
     name: "checktt",
     alias: ['check'],
     author: "Nguyên Blue",
-    category: "SYSTEMS",
+    category: "GROUPS",
     version: "2.1", 
     nopre: false,
     admin: false,
