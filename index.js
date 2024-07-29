@@ -61,10 +61,10 @@ const nhapThongTinTuNguoiDung = async () => {
 
     const prefix = await nhapDuLieu('Hãy Nhập Prefix: ');
     const uidAdmin = await nhapDuLieu('Hãy Nhập Uid Admin: ');
-
+    const icon_unsend = await nhapDuLieu('Hãy Nhập Icon Để Auto UnSend khi thả: ');
     rl.close();
 
-    fs.writeFileSync('./config.json', `{\n"PREFIX": "${prefix}",\n"UID_ADMIN": ["${uidAdmin}"]\n}`);
+    fs.writeFileSync('./config.json', `{\n"IconUnSend": "${icon_unsend}",\n"PREFIX": "${prefix}",\n"UID_ADMIN": ["${uidAdmin}"]\n}`);
     console.info('Đã cập nhật hoặc tạo file .env thành công.');
 
     doneAnimation('Setup hoàn tất...');
