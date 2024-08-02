@@ -9,19 +9,26 @@
 		"author": "Nguyên Blue",
 		"license": "GPL-3.0",
 		"dependencies": {
+				"@google/generative-ai": "^0.16.0",
 				"axios": "^1.7.2",
+				"chartjs-node-canvas": "^4.1.6",
 				"cheerio": "^1.0.0-rc.12",
 				"child_process": "",
 				"crypto": "^1.0.1",
+				"discord.js": "^14.15.3",
 				"fca-c2x": "github:nguyenblur/fca-c2x",
 				"fs": "^0.0.1-security",
+				"fs-extra": "^11.2.0",
+				"memory": "^0.0.3",
 				"moment-timezone": "",
 				"node-cache": "^5.1.2",
+				"node-disk-info": "^1.3.0",
+				"nodejs-file-downloader": "^4.13.0",
+				"nosql-json-database": "^1.0.0",
 				"path": "*",
 				"request": "^2.53.0",
 				"sequelize": "^6.37.3",
 				"sqlite3": "^5.1.7",
-				"uuid": "*",
-				"zingmp3-api-full-v3": "^3.0.0"
+				"uuid": "*"
 		}
 }
