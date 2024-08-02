@@ -1,116 +1,111 @@
-const os = require('os');
-const moment = require('moment-timezone');
-const fs = require('fs').promises;
-const nodeDiskInfo = require('node-disk-info');
-const path = require('path');
+const os = require("os");
+const fs = require("fs-extra");
 
-const formatSize = (size) => {
-  if (size < 1024) return `${size} B`;
-  else if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
-  else return `${(size / (1024 * 1024)).toFixed(2)} MB`;
-};
-
-const getDirectorySize = async (dirPath) => {
-  let totalSize = 0;
-
-  const calculateSize = async (filePath) => {
-    try {
-      const stats = await fs.stat(filePath);
-      if (stats.isFile()) {
-        totalSize += stats.size;
-      } else if (stats.isDirectory()) {
-        const fileNames = await fs.readdir(filePath);
-        await Promise.all(fileNames.map(fileName => calculateSize(path.join(filePath, fileName))));
-      }
-    } catch (error) {
-      console.error(`Error calculating size for ${filePath}:`, error);
-    }
-  };
-
-  await calculateSize(dirPath);
-
-  return totalSize;
-};
+const startTime = new Date();
 
 module.exports = {
   name: "uptime",
   alias: ['up', 'upt'],
-  author: "Niio-team (Vtuan) • Nguyên Blue [convert]",
+  author: "ArYAN • Nguyên Blue [convert]",
   category: "SYSTEMS",
   version: "1.0",
   nopre: false,
   admin: false,
   wait: 3,
-  desc: "xem time uptime",
-  async onCall({ args, message }) {
-    const startPing = Date.now();
-    const directoryPath = args[0] || './';
+  desc: "Xem thời gian uptime của hệ thống",
+  async onCall({ api, message, client }) {
     try {
-      const files = await fs.readdir(directoryPath);
+      const uptimeInSeconds = (new Date() - startTime) / 1000;
 
-      let totalSize = 0;
+      const seconds = uptimeInSeconds;
+      const days = Math.floor(seconds / (3600 * 24));
+      const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secondsLeft = Math.floor(seconds % 60);
+      const uptimeFormatted = `${days}d ${hours}h ${minutes}m ${secondsLeft}s`;
 
-      await Promise.all(files.map(async (fileName) => {
-        const filePath = path.join(directoryPath, fileName);
-        const stats = await fs.stat(filePath);
+      const loadAverage = os.loadavg();
+      const cpuUsage =
+        os
+          .cpus()
+          .map((cpu) => cpu.times.user)
+          .reduce((acc, curr) => acc + curr) / os.cpus().length;
 
-        if (stats.isDirectory()) {
-          totalSize += await getDirectorySize(filePath);
-        } else {
-          totalSize += stats.size;
-        }
-      }));
+      const totalMemoryGB = os.totalmem() / 1024 ** 3;
+      const freeMemoryGB = os.freemem() / 1024 ** 3;
+      const usedMemoryGB = totalMemoryGB - freeMemoryGB;
 
-      const getBotStatus = (ping) => ping < 200 ? 'smooth' : ping < 800 ? 'average' : 'lag';
+      const currentDate = new Date();
+      const options = { year: "numeric", month: "numeric", day: "numeric" };
+      const date = currentDate.toLocaleDateString("vi-VN", options);
+      const time = currentDate.toLocaleTimeString("vi-VN", {
+        timeZone: "Asia/Ho_Chi_Minh",
+        hour12: true,
+      });
 
-      const uptime = process.uptime();
-      const [uptimeHours, uptimeMinutes, uptimeSeconds] = [
-        Math.floor(uptime / 3600),
-        Math.floor((uptime % 3600) / 60),
-        Math.floor(uptime % 60)
-      ];
+      const timeStart = Date.now();
+      await api.sendMessage({
+        body: "🔎 | Đang kiểm tra...",
+      }, message.threadID);
 
-      const cpuCount = os.cpus().length;
-      const cpuModel = os.cpus()[0].model;
-      const cpuSpeed = os.cpus()[0].speed;
-      const osType = os.type();
-      const osRelease = os.release();
-      const osPlatform = os.platform();
-      const osHostname = os.hostname();
-      const osArch = os.arch();
+      const ping = Date.now() - timeStart;
 
-      const freeMemory = os.freemem();
-      const totalMemory = os.totalmem();
-      const usedMemory = totalMemory - freeMemory;
-      const botStatus = getBotStatus(Date.now() - startPing);
-
-      try {
-        const disks = await nodeDiskInfo.getDiskInfo();
-        const firstDisk = disks[0] || {};
-
-        const convertToGB = (bytes) => bytes ? (bytes / (1024 * 1024 * 1024)).toFixed(2) + 'GB' : 'N/A';
-
-        const pingReal = Date.now() - startPing;
-
-        const replyMsg = `
-🕒 ${moment().tz('Asia/Ho_Chi_Minh').format('HH:mm:ss')} ${moment().tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
-⌛ Uptime: ${uptimeHours.toString().padStart(2, '0')}:${uptimeMinutes.toString().padStart(2, '0')}:${uptimeSeconds.toString().padStart(2, '0')}
-🛜 Ping: ${pingReal}ms
-🔣 Bot status: ${botStatus}
-🖥️ CPU: ${cpuCount} x ${cpuModel} @ ${cpuSpeed} MHz
-📊 OS: ${osType} ${osRelease} ${osPlatform} ${osArch}
-📁 Hostname: ${osHostname}
-🔣 RAM: ${(freeMemory / 1024 / 1024 / 1024).toFixed(2)}GB / ${(totalMemory / 1024 / 1024 / 1024).toFixed(2)}GB
-💾 Storage: ${convertToGB(firstDisk.size)} (${convertToGB(firstDisk.used)} used, ${convertToGB(firstDisk.available)} available)
-👥 Node.js version: ${process.version}
-`.trim();
-
-        message.send(replyMsg, message.threadID);
-      } catch (error) {
-        console.error('❎ Error getting disk information:', error.message);
+      let pingStatus = "Ping không ổn định";
+      if (ping < 1000) {
+        pingStatus = "Ping ổn định";
       }
+
+      const systemInfo = `
+♡   ∩_∩
+（„• ֊ •„)♡
+╭─∪∪────────────⟡
+│ 𝗨𝗣𝗧𝗜𝗠𝗘 𝗜𝗡𝗙𝗢
+├───────────────⟡
+│ 🤖 𝗕𝗢𝗧 𝗜𝗡𝗙𝗢 
+│ 𝙽𝙰𝙼𝙴: C2X
+│ 𝙻𝙰𝙽𝙶: 𝙽𝚘𝚍𝚎𝚓𝚜
+│ 𝙿𝚁𝙵𝙸𝚇: ${client.config.PREFIX}
+├───────────────⟡
+│ ⏰ 𝗥𝗨𝗡𝗧𝗜𝗠𝗘
+│  ${uptimeFormatted}
+├───────────────⟡
+│ 👑 𝗦𝗬𝗦𝗧𝗘𝗠 𝗜𝗡𝗙𝗢
+│ OS: ${os.type()} ${os.arch()}
+│ Node.js Version: ${process.version}
+│ CPU Model: ${os.cpus()[0].model}
+│ Memory Usage: ${usedMemoryGB.toFixed(2)} GB / ${totalMemoryGB.toFixed(2)} GB
+│ CPU Usage: ${cpuUsage.toFixed(1)}%
+│ RAM Usage: ${process.memoryUsage().heapUsed / 1024 / 1024} MB
+├───────────────⟡
+│ ✅ 𝗢𝗧𝗛𝗘𝗥 𝗜𝗡𝗙𝗢
+│ 𝙳𝙰𝚃𝙴: ${date}
+│ 𝚃𝙸𝙼𝙴: ${time}
+│ 𝙿𝙸𝙽𝙶: ${ping}ms
+│ 𝚂𝚃𝙰𝚃𝚄𝚂: ${pingStatus}
+╰───────────────⟡
+`;
+
+      api.sendMessage(
+        {
+          body: systemInfo,
+        },
+        message.threadID,
+        (err, messageInfo) => {
+          if (err) {
+            console.error("Error sending message:", err);
+          } else {
+           // console.log("Message sent successfully:", messageInfo);
+          }
+        }
+      );
+
     } catch (error) {
-      console.error('❎ Error reading directory:', error);
+      console.error("Error retrieving system information:", error);
+      api.sendMessage(
+        "Không thể lấy thông tin hệ thống.",
+        message.threadID,
+        message.messageID
+      );
+    }
   }
-}
 };
