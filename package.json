@@ -11,7 +11,7 @@
 		"dependencies": {
 				"@google/generative-ai": "^0.16.0",
 				"axios": "^1.7.2",
-				"chartjs-node-canvas": "^4.1.6",
+				"canvas": "*",
 				"cheerio": "^1.0.0-rc.12",
 				"child_process": "",
 				"crypto": "^1.0.1",
