@@ -1,10 +1,10 @@
 module.exports = {
   name: "weather",
   author: "Goat-Bot, Nguyên Blue [convert]",
-  category: "SYSTEMS",
+  category: "GROUPS",
   version: "1.0",
   nopre: false,
-  admin: true,
+  admin: fasle,
   wait: 3,
   desc: "Xem Thông Tin Thời Tiết",
 async onCall({ api, args, message }) {
