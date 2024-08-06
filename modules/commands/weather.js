@@ -4,7 +4,7 @@ module.exports = {
   category: "GROUPS",
   version: "1.0",
   nopre: false,
-  admin: fasle,
+  admin: false,
   wait: 3,
   desc: "Xem Thông Tin Thời Tiết",
 async onCall({ api, args, message }) {
