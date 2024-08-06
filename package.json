@@ -19,7 +19,7 @@
 				"fca-c2x": "github:nguyenblur/fca-c2x",
 				"fs": "^0.0.1-security",
 				"fs-extra": "^11.2.0",
-				"memory": "^0.0.3",
+				"memory": "github:nguyenblur/memory",
 				"moment-timezone": "",
 				"node-cache": "^5.1.2",
 				"node-disk-info": "^1.3.0",
