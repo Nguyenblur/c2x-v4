@@ -13,6 +13,9 @@ async function bypassUrl(url) {
     } else if (url.includes('laymangay')) {
       apiUrl = 'https://laymangay.com/que?q=status,azauth,q,t,z&filter=connection';
       publisherUrl = `https://laymangay.com/publisher`;
+    } else if (url.includes('trafficuser')) {
+      apiUrl = 'https://my.trafficuser.net/que?q=status,azauth,q,t,z&filter=connection';
+      publisherUrl = `https://my.trafficuser.net/publisher`;
     } else if (url.includes('linkvertise')) {
   // https://bypass.city/bypass?bypass=
       apiUrl = `https://api.bypass.vip/bypass?url=${encodeURIComponent(url)}`;
@@ -48,7 +51,7 @@ module.exports = {
     const url = args[0];
 
     if (!url) {
-      return message.send('Các liên kết hỗ trợ:\n1. laymangay(.)net or com\n2. link68(.)net\n3. traffic123(.)net\n4. linkvertise(.)com\n\n cách dùng: bypass [url]', message.threadID);
+      return message.send('Các liên kết hỗ trợ:\n1. laymangay(.)net or com\n2. link68(.)net\n3. traffic123(.)net\n4. trafficuser(.)net\n5. linkvertise(.)com\n\n cách dùng: bypass [url]', message.threadID);
     }
   
     try {

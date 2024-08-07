@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const axios = require('axios');
 const { createCanvas, loadImage } = require('canvas');
 const NodeCache = require('node-cache');
@@ -21,17 +21,6 @@ function calculateLevelAndExp(userExp) {
         futureExp: nextLevelExp,
         percentLevel: percentLevel
     };
-}
-
-function drawRoundRect(ctx, x, y, width, height, radius) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.arcTo(x + width, y, x + width, y + height, radius);
-    ctx.arcTo(x + width, y + height, x, y + height, radius);
-    ctx.arcTo(x, y + height, x, y, radius);
-    ctx.arcTo(x, y, x + width, y, radius);
-    ctx.closePath();
-    ctx.fill();
 }
 
 function getLevelText(level) {
@@ -59,9 +48,19 @@ function getLevelText(level) {
     }
 }
 
+function drawRoundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + width, y, x + width, y + height, radius);
+    ctx.arcTo(x + width, y + height, x, y + height, radius);
+    ctx.arcTo(x, y + height, x, y, radius);
+    ctx.arcTo(x, y, x + width, y, radius);
+    ctx.closePath();
+    ctx.fill();
+}
 
 async function createRankCard(canvas, top, avt, name, currentLevel, currentExp, futureExp, percentLevel) {
-    const ctx = canvas.getContext("2d");
+   const ctx = canvas.getContext("2d");
     const cardTemplatePath = './db/data/card/card.png';
     const template = await loadImage(cardTemplatePath);
     const ratio = Math.min(
@@ -110,10 +109,10 @@ async function createRankCard(canvas, top, avt, name, currentLevel, currentExp, 
     ctx.closePath();
     ctx.clip();
     ctx.drawImage(await loadImage(avt), 36, 40, 328, 328);
-
     const fimg = canvas.toBuffer("image/png");
     return { fimg, canvas };
 }
+
 
 function readJsonFile(filePath) {
     try {
@@ -153,9 +152,10 @@ function getInteractionInfo(entries, userIdToCheck, periodName) {
         let totalInteractions = entries.reduce((total, entry) => total + entry.count, 0);
         const interactionPercentage = calculatePercentage(userEntry.count, totalInteractions);
 
-        return `🗓️ Tin Nhắn ${periodName}: ${userEntry.count}\n` +
-            `📊 Tỷ lệ tương tác ${periodName}: ${interactionPercentage}%\n` +
-            `🏆 Hạng ${periodName}: #${userPosition}\n\n`;
+        return `
+├─Tin Nhắn ${periodName}: ${userEntry.count}
+│  └─Hạng ${periodName}: #${userPosition}
+│      └─Tỷ Lệ Tương Tác ${periodName}: ${interactionPercentage}%`;
     }
     return "";
 }
@@ -228,17 +228,20 @@ module.exports = {
             let userExp = userEntry ? userEntry.count : 0;
             let { level: currentLevel, currentExp, futureExp, percentLevel } = calculateLevelAndExp(userExp);
     
-            const infoMessage = `[ TỔNG TƯƠNG TÁC CỦA BẠN ]\n\n` +
-                `👤 Tên: ${userName}\n` +
-                `🪪 Chức Vụ: ${userRole}\n` +
-                `🔗 Liên Kết: https://www.facebook.com/profile.php?id=${userIdToCheck}\n` +
-                `🔖 Cấp Bậc: ${getLevelText(currentLevel)}\n` +
-                `🧬 Kinh Nghiệm: ${currentExp}/${futureExp}\n` +
-                `🦠 Tiến Trình: ${percentLevel}%\n\n` +
-                `${interactionInfo}\n` +
-                `⏱️ Thời gian tương tác gần đây: ${interactionTimeInfo}\n` +
-                `📆 Thời gian tham gia nhóm: ${joinTimeInfo}\n\n` +
-                `📌 Thả cảm xúc '❤️' tin nhắn này để xem tổng tin nhắn của toàn bộ thành viên trong nhóm`;
+            const infoMessage = `
+╭─Tên: ${userName}
+│  ├─Chức Vụ: ${userRole}
+│  └─Cấp Bậc: ${getLevelText(currentLevel)}
+│     ├─Kinh Nghiệm: ${currentExp}/${futureExp}
+│     └─Tiến Trình: ${percentLevel}%
+├─Thời Gian
+│  └─Tương Tác Gần Đây: ${interactionTimeInfo}
+│     └─Tham Gia Nhóm: ${joinTimeInfo}
+│${interactionInfo}
+└─END
+
+📌 Thả cảm xúc '❤️' tin nhắn này để xem tổng tin nhắn của toàn bộ thành viên trong nhóm
+`;
     
             const canvas = createCanvas(1133, 370);
             const avtUrl = await axios.get(profilePicUrl, { responseType: "arraybuffer" });

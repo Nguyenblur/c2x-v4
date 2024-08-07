@@ -1,6 +1,6 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
-
+const axios = require('axios');
 const jsonFilePath = path.join('./db/data/tiktok_girl.json');
 
 function readJsonFile() {
@@ -36,15 +36,22 @@ module.exports = {
         if (args.length !== 1) {
             return message.reply('Hãy nhập đúng định dạng: api [url]', message.threadID);
         }
-
-        const newUrl = args[0];
-
+        const url = args[0];
+        const response = await axios.get(url);
+        const newUrl = decodeURIComponent(response.request.res.responseUrl);
+        const videoIdRegex = /video\/(\d+)/;
+        const match = newUrl.match(videoIdRegex);
+        let cleanUrl;
+        if (match) {
+            const videoId = match[1];
+            cleanUrl = newUrl.substr(0, newUrl.indexOf(videoId) + videoId.length);
+        } else {
+            console.log('Video ID not found');
+            return message.reply('URL không hợp lệ', message.threadID);
+        }
         let currentData = readJsonFile();
-
-        currentData.push(newUrl);
-
+        currentData.push(cleanUrl);
         writeJsonFile(currentData);
-
-        message.reply(`Đã thêm URL ${newUrl} vào danh sách.`, message.threadID);
+        message.reply(`Đã thêm URL ${cleanUrl} vào danh sách.`, message.threadID);
     },
 };
