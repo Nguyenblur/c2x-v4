@@ -155,7 +155,8 @@ function getInteractionInfo(entries, userIdToCheck, periodName) {
         return `
 ├─Tin Nhắn ${periodName}: ${userEntry.count}
 │  └─Hạng ${periodName}: #${userPosition}
-│      └─Tỷ Lệ Tương Tác ${periodName}: ${interactionPercentage}%`;
+│      └─Tỷ Lệ Tương Tác ${periodName}: ${interactionPercentage}%
+│`;
     }
     return "";
 }
