@@ -1,4 +1,4 @@
-const GoogleAuthenticator = require('../../app/google/Authenticator');
+const GoogleAuthenticator = require('../../utils/google/Authenticator');
 
 module.exports = {
     name: "get2fa",
