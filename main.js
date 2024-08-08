@@ -2,7 +2,7 @@
 const path = require('path');
 const login = require('fca-c2x');
 const { doneAnimation, errAnimation } = require('./logger/index');
-const { UserInThreadData, getUser, getThread, money } = require('./app/index');
+const { UserInThreadData, getUser, getThread, money } = require('./utils/data');
 
 const commandsDir = path.join(__dirname, './modules/commands'), eventsDir = path.join(__dirname, './modules/events');
 
@@ -16,7 +16,7 @@ const client = {
    config: {}
 };
 
-fs.readFile('./config.json', 'utf8', (err, data) => {
+fs.readFile('./config/config.main.json', 'utf8', (err, data) => {
     if (err) {
       console.log(err);
     } else {
@@ -26,10 +26,6 @@ fs.readFile('./config.json', 'utf8', (err, data) => {
 
 async function startBot() {
     try {
-        if (!fs.existsSync('./appstate.json')) {
-            console.error('Không tìm thấy appstate.json, hãy tạo mới');
-            process.exit(0);
-        }
         login(
             { appState: JSON.parse(fs.readFileSync("appstate.json", "utf8")) },
             {
