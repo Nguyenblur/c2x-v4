@@ -3,6 +3,7 @@ const path = require('path');
 const login = require('fca-c2x');
 const { doneAnimation, errAnimation } = require('../logger/index');
 const { UserInThreadData, getUser, getThread, money } = require('./data');
+const startServer = require('../dashboard/server/app');
 
 const commandsDir = path.join(__dirname, '../modules/commands'), eventsDir = path.join(__dirname, '../modules/events');
 
@@ -13,16 +14,8 @@ const client = {
    eventMap: new Map(),
    cooldowns: new Map(),
    mqttListener: null,
-   config: {}
+   config: require('../config/config.main.json')
 };
-
-fs.readFile('./config/config.main.json', 'utf8', (err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      Object.assign(client.config, JSON.parse(data));
-    }
-});
 
 async function startBot() {
     try {
@@ -46,11 +39,11 @@ async function startBot() {
                     }
                     return;
                 }
-                doneAnimation('Đã kết nối thành công.');
-                doneAnimation('successfully initialize and connect to the database');
+                doneAnimation('kết nối thành công cơ sở dữ liệu');
+                startServer();
                 const userId = api.getCurrentUserID();
                 const user = await api.getUserInfo([userId]);
-                console.info(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
+                doneAnimation(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
                 client.commands = loadCommands(api);
                 client.events = loadEvents(api);
                 startmqttListener(api);
@@ -90,7 +83,7 @@ function loadCommands(api) {
             return null;
         }
     }).filter(command => command !== null);
-    console.info(`Successfully loaded ${commands.length} command(s)`);
+    doneAnimation(`Successfully loaded ${commands.length} command(s)`);
     return commands;
 }
 
@@ -110,7 +103,7 @@ function loadEvents(api) {
             return null;
         }
     }).filter(event => event !== null);
-    console.info(`Successfully loaded ${events.length} event(s)`);
+    doneAnimation(`Successfully loaded ${events.length} event(s)`);
     return events;
 }
 

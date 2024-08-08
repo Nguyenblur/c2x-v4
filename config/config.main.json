@@ -1,5 +1,7 @@
 {
-"IconUnSend": "👍",
+"PORT": 8080,
+"runServer": true,
+"ICON_UNSEND": "👍",
 "PREFIX": "!",
 "UID_ADMIN": ["100093082543154"]
 }

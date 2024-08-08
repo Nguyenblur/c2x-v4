@@ -16,6 +16,7 @@
 				"child_process": "",
 				"crypto": "^1.0.1",
 				"discord.js": "^14.15.3",
+				"express": "^4.19.2",
 				"fca-c2x": "github:nguyenblur/fca-c2x",
 				"fs": "^0.0.1-security",
 				"fs-extra": "^11.2.0",
