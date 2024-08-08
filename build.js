@@ -2,7 +2,7 @@ const { doneAnimation } = require('./logger/index');
 const fs = require('fs'), readline = require('readline'), { spawn } = require('child_process');
 
 const startChatbot = () => {
-    const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "main.js"], {
+    const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "utils/listen.js"], {
         cwd: __dirname,
         stdio: "inherit",
         shell: true
