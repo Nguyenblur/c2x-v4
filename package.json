@@ -4,7 +4,7 @@
 		"description": "BOT MESSAGER NODEJS",
 		"main": "main.js",
 		"scripts": {
-				"start": "node index.js"
+				"start": "node _build.js"
 		},
 		"author": "Nguyên Blue",
 		"license": "GPL-3.0",
