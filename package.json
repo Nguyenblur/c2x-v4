@@ -1,6 +1,6 @@
 {
 		"name": "c2x",
-		"version": "2.9.16",
+		"version": "3.0.0",
 		"description": "BOT MESSAGER NODEJS",
 		"main": "main.js",
 		"scripts": {
