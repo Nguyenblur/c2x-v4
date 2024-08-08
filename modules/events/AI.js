@@ -452,7 +452,7 @@ async function AI(client, api, message) {
       client.history = history;
       fs.writeFileSync(`./history/${message.threadID}.json`, JSON.stringify(history, null, 2));
     } catch (e) {
-      console.error(client.facebook, e);
+      console.error(e);
       if (e.status == 429) {
         await delay(15 * 1000);
         AI(client, api, message);
