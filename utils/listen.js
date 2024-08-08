@@ -13,8 +13,37 @@ const client = {
    commandMap: new Map(),
    eventMap: new Map(),
    cooldowns: new Map(),
+   language: new Object(),
    mqttListener: null,
    config: require('../config/config.main.json')
+};
+
+const langFile = fs.readFileSync(`./language/${client.config.LANGUAGE || "vi"}.lang`, { encoding: 'utf-8' })
+    .split(/\r?\n|\r/);
+const langData = langFile.filter(item => item.indexOf('#') !== 0 && item.trim() !== '');
+
+for (const item of langData) {
+    const getSeparator = item.indexOf('=');
+    if (getSeparator === -1) continue;  
+    const itemKey = item.slice(0, getSeparator).trim();
+    const itemValue = item.slice(getSeparator + 1).trim();
+    client.language[itemKey] = itemValue.replace(/\\n/gi, '\n'); 
+}
+
+getLang = function (...args) {
+    const langText = client.language;
+    if (!langText.hasOwnProperty(args[0])) {
+        throw new Error(`${__filename} - Không tìm thấy khóa ngôn ngữ: ${args[0]}`);
+    }
+
+    let text = langText[args[0]];
+
+    for (let i = 1; i < args.length; i++) {
+        const regEx = new RegExp(`\\$${i}`, 'g');
+        text = text.replace(regEx, args[i]);
+    }
+
+    return text;
 };
 
 async function startBot() {
@@ -29,7 +58,7 @@ async function startBot() {
             },
             async (err, api) => {
                 if (err) {
-                    errAnimation('Đang kết nối...');
+                    errAnimation(getLang('build.start'));
                     if (err.code === 'ETIMEDOUT') {
                         console.warn('Lỗi timeout, đang thử lại');
                         startBot();
@@ -39,11 +68,15 @@ async function startBot() {
                     }
                     return;
                 }
-                doneAnimation('kết nối thành công cơ sở dữ liệu');
+                doneAnimation(getLang('database.init.done')); 
+               
+                if (client.config.RUN_SERVER_UPTIME) {
                 startServer();
+                }  
                 const userId = api.getCurrentUserID();
                 const user = await api.getUserInfo([userId]);
-                doneAnimation(`Đã kết nối với ${user[userId]?.name || null} (${userId})`);
+                const userName = user[userId]?.name || 'Người dùng';
+                doneAnimation(getLang('build.start.logged', userName, userId));
                 client.commands = loadCommands(api);
                 client.events = loadEvents(api);
                 startmqttListener(api);
@@ -79,11 +112,11 @@ function loadCommands(api) {
             }
             return commandModule;
         } else {
-            console.error(`Invalid command module in file ${file}`);
+            console.error(getLang('reload.commands.error.failed', file));
             return null;
         }
     }).filter(command => command !== null);
-    doneAnimation(`Successfully loaded ${commands.length} command(s)`);
+    doneAnimation(getLang('reload.commands', commands.length));
     return commands;
 }
 
@@ -99,11 +132,11 @@ function loadEvents(api) {
             }
             return eventModule;
         } else {
-            console.error(`Invalid event module in file ${file}`);
+            console.error(getLang('reload.events.error.failed', file));
             return null;
         }
     }).filter(event => event !== null);
-    doneAnimation(`Successfully loaded ${events.length} event(s)`);
+    doneAnimation(getLang('reload.events', events.length));
     return events;
 }
 
@@ -162,7 +195,7 @@ function handleMQTTEvents(api) {
                     await module.onMessage({ client, api, message, user: getUser, thread: getThread, money });
                   }
                 } catch (err) {
-                  console.error(`Error handling message (${module.name}):`, err);
+                  console.error(err);
                 }
               }
 
@@ -221,7 +254,7 @@ function handleMQTTEvents(api) {
                     api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
                     return;
                   }
-                await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, money, reload: reloadCommandsAndEvents });
+                await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, money, reload: reloadCommandsAndEvents, getLang });
             } else {
                 if (hasPrefix) {
                     const fallbackCommand = client.commandMap.get('\n');
@@ -242,7 +275,7 @@ function startmqttListener(api) {
     }
     handleMQTTEvents(api);
     setInterval(() => {
-        console.log('Reloading MQTT listener...');
+        doneAnimation(getLang('build.refreshMqtt'));
         if (client.mqttListener) {
             client.mqttListener.stopListening();
         }

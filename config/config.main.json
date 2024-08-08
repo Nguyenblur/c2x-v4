@@ -1,7 +1,10 @@
 {
-"PORT": 8080,
-"runServer": true,
-"ICON_UNSEND": "👍",
-"PREFIX": "!",
-"UID_ADMIN": ["100093082543154"]
+  "PORT": 8080,
+  "RUN_SERVER_UPTIME": true,
+  "LANGUAGE": "vi",
+  "ICON_UNSEND": "👍",
+  "PREFIX": "!",
+  "UID_ADMIN": [
+    "100093082543154"
+  ]
 }

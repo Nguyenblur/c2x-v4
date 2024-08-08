@@ -1,0 +1,13 @@
+# database
+database.init.done=Kết nối thành công cơ sở dữ liệu
+
+# build
+build.start=Đang kết nối...
+build.start.logged=Đã kết nối với $1 ($2)
+build.refreshMqtt=Đang làm mới MQTT...
+
+# reload
+reload.commands=Reload thành công $1 command(s)
+reload.commands.error.failed=Không thể tải lệnh: $1
+reload.events=Reload thành công $1 event(s)
+reload.events.error.failed=Không thể tải sự kiện: $1

@@ -95,6 +95,9 @@ const promptUserForConfiguration = async () => {
     rl.close();
 
     fs.writeFileSync('./config/config.main.json', JSON.stringify({
+        PORT: 8080,
+        RUN_SERVER_UPTIME: true,
+        LANGUAGE: "vi",
         ICON_UNSEND: icon_unsend,
         PREFIX: prefix,
         UID_ADMIN: [uidAdmin]
