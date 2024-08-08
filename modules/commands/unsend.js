@@ -23,7 +23,7 @@ module.exports = {
   },
   async onMessage({ client, api, message }) {
     try {
-     const icon = client.config.IconUnSend;
+     const icon = client.config.ICON_UNSEND;
     if (message.senderID != api.getCurrentUserID()) {
         return;
       }
