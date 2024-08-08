@@ -2,6 +2,32 @@ const { doneAnimation } = require('./logger/index');
 const fs = require('fs');
 const readline = require('readline');
 const { spawn } = require('child_process');
+const axios = require('axios'); 
+
+const checkForUpdates = async () => {
+    try {
+        const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+        const currentVersion = packageJson.version;
+
+        const url = 'https://raw.githubusercontent.com/Nguyenblur/c2x/main/package.json';
+
+        try {
+            const response = await axios.get(url);
+            const remotePackageJson = response.data;
+            const latestVersion = remotePackageJson.version;
+
+            if (latestVersion !== currentVersion) {
+                console.info(`Phiên bản mới có sẵn: ${latestVersion}. Hãy cập nhật để sử dụng các tính năng mới.`);
+            } else {
+                doneAnimation('Bạn đang sử dụng phiên bản mới nhất.');
+            }
+        } catch (error) {
+            console.error('Đã xảy ra lỗi khi kiểm tra phiên bản:', error.message);
+        }
+    } catch (error) {
+        console.error('Đã xảy ra lỗi khi đọc package.json hoặc kiểm tra phiên bản:', error.message);
+    }
+};
 
 const startChatbot = () => {
     const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "utils/listen.js"], {
@@ -94,6 +120,7 @@ const main = async () => {
         console.error('Không tìm thấy appstate.json, hãy tạo mới');
         process.exit(0);
     }
+    await checkForUpdates();
     startChatbot();
 };
 
