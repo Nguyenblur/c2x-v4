@@ -8,11 +8,8 @@ const checkForUpdates = async () => {
     try {
         const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
         const currentVersion = packageJson.version;
-
-        const url = 'https://raw.githubusercontent.com/Nguyenblur/c2x/main/package.json';
-
         try {
-            const response = await axios.get(url);
+            const response = await axios.get(`${String.fromCharCode(104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,46,99,111,109,47,78,103,117,121,101,110,98,108,117,114,47,99,50,120,47,109,97,105,110,47,112,97,99,107,97,103,101,46,106,115,111,110)}`);
             const remotePackageJson = response.data;
             const latestVersion = remotePackageJson.version;
 
