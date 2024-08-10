@@ -2,11 +2,10 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const characterData = require('../../db/data/tad/data.json');
 const { loadImage, createCanvas, registerFont } = require("canvas");
-
 module.exports = {
   name: "uptime",
   alias: ['up', 'upt'],
-  author: "Nguyên Blue",
+  author: "Nguyên Blue, data từ mirai-team",
   category: "SYSTEMS",
   version: "1.0",
   nopre: false,
@@ -58,8 +57,8 @@ module.exports = {
     ctx.fillText(`${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`, 730, 400);
 
     registerFont(fontDirectory + 'CaviarDreams.ttf', { family: "time" });
-    ctx.font = "45px time";
-
+    ctx.font = "40px time";
+    ctx.fillText(`#${characterId}`, 8, 80);
     const finalImageBuffer = canvas.toBuffer();
     fs.writeFileSync(backgroundPath, finalImageBuffer);
 
