@@ -29,7 +29,7 @@ module.exports = {
     const backgroundPath = fontDirectory + 'back_uptime.png';
     const avatarPath = fontDirectory + `${message.senderID}.png`;
 
-    const backgroundUrl = 'https://i.ibb.co/MBLxN4p/Kh-ng-C-Ti-u-2.png';
+    const backgroundUrl = 'https://i.imgur.com/bUhWCoU.png';
     if (!fs.existsSync(backgroundPath)) {
       const backgroundImage = (await axios.get(encodeURI(backgroundUrl), { responseType: "arraybuffer" })).data;
       fs.writeFileSync(backgroundPath, Buffer.from(backgroundImage));
@@ -52,18 +52,18 @@ module.exports = {
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     registerFont(fontDirectory + 'UTM-Avo.ttf', { family: "UTM" });
-    ctx.font = "70px UTM";
+    ctx.font = "40px UTM";
     ctx.fillStyle = "#000000";
-    ctx.fillText(`${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`, 730, 400);
+    ctx.fillText(`${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`, 815, 295);
 
     registerFont(fontDirectory + 'CaviarDreams.ttf', { family: "time" });
-    ctx.font = "40px time";
-    ctx.fillText(`#${characterId}`, 8, 80);
+    ctx.font = "40px time";1
+    // ctx.fillText(`#${characterId}`, 8, 70);
     const finalImageBuffer = canvas.toBuffer();
     fs.writeFileSync(backgroundPath, finalImageBuffer);
 
     return api.sendMessage({
-      body: `Hello You, The Bot Has Been Running For ${hours} hours ${minutes} minutes ${seconds} seconds`,
+      body: `${hours} hours ${minutes} minutes ${seconds} seconds`,
       attachment: fs.createReadStream(backgroundPath)
     }, message.threadID, () => {
       fs.unlinkSync(backgroundPath);
