@@ -117,7 +117,7 @@ const main = async () => {
 
     await cleanupTempFolder();
     if (!fs.existsSync('./appstate.json')) {
-        console.error('Không tìm thấy appstate.json, hãy tạo mới');
+        console.error('Không tìm thấy tệp tin appstate.json');
         process.exit(0);
     }
     await checkForUpdates();

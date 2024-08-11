@@ -2,7 +2,7 @@
 const path = require('path');
 const login = require('fca-c2x');
 const { doneAnimation, errAnimation } = require('../logger/index');
-const { UserInThreadData, getUser, getThread, money } = require('./data');
+const { UserInThreadData, getUser, getThread, money, getAllGroupCount, getAllUserCount } = require('./data');
 const startServer = require('../dashboard/server/app');
 
 const commandsDir = path.join(__dirname, '../scripts/commands'), eventsDir = path.join(__dirname, '../scripts/events');
@@ -34,7 +34,7 @@ for (const item of langData) {
 getLang = function (...args) {
     const langText = client.language;
     if (!langText.hasOwnProperty(args[0])) {
-        throw new Error(`${__filename} - Không tìm thấy khóa ngôn ngữ: ${args[0]}`);
+        return;
     }
 
     let text = langText[args[0]];
@@ -58,28 +58,23 @@ async function startBot() {
                 logLevel: 'silent'
             },
             async (err, api) => {
+                doneAnimation(getLang('currentlyLogged'));
                 if (err) {
-                    errAnimation(getLang('build.start'));
-                    if (err.code === 'ETIMEDOUT') {
-                        console.warn('Lỗi timeout, đang thử lại');
-                        startBot();
-                    } else {
-                        console.error(err);
-                        process.exit(0);
-                    }
-                    return;
+                errAnimation(getLang('loginError'));
+                return console.error(err);
                 }
-                doneAnimation(getLang('database.init.done')); 
-               
-                if (client.config.RUN_SERVER_UPTIME) {
-                startServer();
-                }  
+  
                 const userId = api.getCurrentUserID();
                 const user = await api.getUserInfo([userId]);
-                const userName = user[userId]?.name || 'Người dùng';
-                doneAnimation(getLang('build.start.logged', userName, userId));
+                const userName = user[userId]?.name || null;
+                doneAnimation(getLang('loginSuccess', userName, userId));
+                if (client.config.RUN_SERVER_UPTIME) {
+                    startServer(getLang);
+                }
+                doneAnimation(getLang('loadThreadDataSuccess', await getAllGroupCount()));
+                doneAnimation(getLang('loadUserDataSuccess', await getAllUserCount()));    
                 client.commands = loadCommands(api);
-                client.events = loadEvents(api);
+                client.events = loadEvents(api); 
                 startmqttListener(api);
             }
         );
@@ -113,11 +108,11 @@ function loadCommands(api) {
             }
             return commandModule;
         } else {
-            console.error(getLang('reload.commands.error.failed', file));
+            console.error(getLang('reloadCammandError', file));
             return null;
         }
     }).filter(command => command !== null);
-    doneAnimation(getLang('reload.commands', commands.length));
+    doneAnimation(getLang('reloadCommand', commands.length));
     return commands;
 }
 
@@ -133,11 +128,11 @@ function loadEvents(api) {
             }
             return eventModule;
         } else {
-            console.error(getLang('reload.events.error.failed', file));
+            console.error(getLang('reloadEventError', file));
             return null;
         }
     }).filter(event => event !== null);
-    doneAnimation(getLang('reload.events', events.length));
+    doneAnimation(getLang('reloadEvent', events.length));
     return events;
 }
 
@@ -239,7 +234,7 @@ function handleMQTTEvents(api) {
                         if (currentTime < expirationTime) {
                             if (!userCooldowns.get(`${commandName}_notified`)) {
                                 const timeLeft = (expirationTime - currentTime) / 1000;
-                                api.sendMessage(`❌ Bạn đã sử dụng lệnh '${commandName}' quá nhanh. Vui lòng thử lại sau ${timeLeft.toFixed(1)} giây.`, message.threadID);
+                                api.sendMessage(getLang('commandWait', commandName, timeLeft.toFixed(1)), message.threadID);
                                 userCooldowns.set(`${commandName}_notified`, true); 
                             }
                             return;
@@ -252,10 +247,28 @@ function handleMQTTEvents(api) {
                     userCooldowns.delete(`${commandName}_notified`); 
                 }                              
                 if (commandModule.admin && !client.config.UID_ADMIN.includes(message.senderID)) {
-                    api.sendMessage('❌ Chỉ admin mới có thể sử dụng lệnh này.', message.threadID);
+                    api.sendMessage(getLang('commandAdmin'), message.threadID);
                     return;
                   }
-                await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, money, reload: reloadCommandsAndEvents, getLang });
+                  let getText;
+
+                  if (commandModule.lang && typeof commandModule.lang === 'object' && commandModule.lang.hasOwnProperty(client.config.LANGUAGE)) {
+                   getText = (...values) => {
+                  const language = commandModule.lang[client.config.LANGUAGE];
+                  const key = values[0];
+                  let text = language[key] || '';
+
+                  for (let i = 1; i < values.length; i++) {
+                  const regEx = new RegExp(`\\$${i}`, 'g');
+                  text = text.replace(regEx, values[i]);
+                  }
+
+                  return text;
+                  };
+             } else {
+                 getText = () => {};
+            }
+                await commandModule.onCall({ client, api, message, args, user: getUser, thread: getThread, getAllUserCount, getAllGroupCount, money, reload: reloadCommandsAndEvents, getText });
             } else {
                 if (hasPrefix) {
                     const fallbackCommand = client.commandMap.get('\n');
@@ -276,7 +289,7 @@ function startmqttListener(api) {
     }
     handleMQTTEvents(api);
     setInterval(() => {
-        doneAnimation(getLang('build.refreshMqtt'));
+        doneAnimation(getLang('refreshMqtt'));
         if (client.mqttListener) {
             client.mqttListener.stopListening();
         }

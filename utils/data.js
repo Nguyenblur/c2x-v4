@@ -105,4 +105,12 @@ async function getThread(tid) {
   return thread.toJSON();
 }
 
-module.exports = { UserInThreadData, getUser, getThread, money };
+async function getAllGroupCount() {
+  return await Thread.count({ distinct: true, col: 'tid' });
+}
+
+async function getAllUserCount() {
+  return await User.count({ distinct: true, col: 'uid' });
+}
+
+module.exports = { UserInThreadData, getUser, getThread, money,  getAllGroupCount, getAllUserCount };

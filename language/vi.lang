@@ -1,13 +1,15 @@
-# database
-database.init.done=Kết nối thành công cơ sở dữ liệu
-
-# build
-build.start=Đang kết nối...
-build.start.logged=Đã kết nối với $1 ($2)
-build.refreshMqtt=Đang làm mới MQTT...
-
-# reload
-reload.commands=Reload thành công $1 command(s)
-reload.commands.error.failed=Không thể tải lệnh: $1
-reload.events=Reload thành công $1 event(s)
-reload.events.error.failed=Không thể tải sự kiện: $1
+# utils/listen.js
+currentlyLogged=Đang tiến hành đăng nhập
+loginSuccess=Đăng nhập thành công, $1 ($2)
+loginError=Đã xảy ra lỗi khi đăng nhập
+loadThreadDataSuccess=Đã tải xong dữ liệu của $1 nhóm
+loadUserDataSuccess=Đã tải xong dữ liệu của $1 người dùng
+refreshMqtt=Đang làm mới MQTT...
+restartedBot=Đã khởi động lại bot
+reloadCommand=Đã tải xong $1 lệnh
+reloadEvent=Đã tải xong $1 sự kiện
+reloadCammandError=Không thể tải lệnh: $1
+reloadEventError=Không thể tải sự kiện: $1
+serverUptimeRun=Đã chạy server với port $1
+commandAdmin=❌ Chỉ admin mới có thể sử dụng lệnh này.
+commandWait=❌ Bạn đã sử dụng lệnh '$1' quá nhanh. Vui lòng thử lại sau $2 giây.
