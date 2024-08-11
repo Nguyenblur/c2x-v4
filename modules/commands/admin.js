@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const configPath = path.resolve('./config.json');
+const configPath = path.resolve('./config/config.main.json');
 
 function readConfig() {
   try {
