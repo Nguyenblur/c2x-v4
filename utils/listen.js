@@ -5,13 +5,14 @@ const { doneAnimation, errAnimation } = require('../logger/index');
 const { UserInThreadData, getUser, getThread, money } = require('./data');
 const startServer = require('../dashboard/server/app');
 
-const commandsDir = path.join(__dirname, '../modules/commands'), eventsDir = path.join(__dirname, '../modules/events');
+const commandsDir = path.join(__dirname, '../scripts/commands'), eventsDir = path.join(__dirname, '../scripts/events');
 
 const client = {
    commands: [],
    events: [],
    commandMap: new Map(),
    eventMap: new Map(),
+   replyHandlers: new Map(),
    cooldowns: new Map(),
    language: new Object(),
    mqttListener: null,
