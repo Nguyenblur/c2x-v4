@@ -13,3 +13,4 @@ reloadEventError=Failed to load event: $1
 serverUptimeRun=Server is running on port $1
 commandAdmin=❌ Only admins can use this command.
 commandWait=❌ You used command '$1' too quickly. Please try again in $2 seconds.
+commandNsfw=❌ This group is not allowed to use NSFW commands.
