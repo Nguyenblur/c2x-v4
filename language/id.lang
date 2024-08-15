@@ -1,0 +1,21 @@
+# utils/listen.js
+currentlyLogged=Sedang login...
+
+loginSuccess=Login berhasil - $1 ($2)
+loginError=Login gagal
+loadThreadDataSuccess=Data grup $1 berhasil dimuat
+loadUserDataSuccess=Data pengguna $1 berhasil dimuat
+
+pluginLoading=Plugin sedang dimuat...
+
+refreshMqtt=Mqtt sedang direfresh...
+restartedBot=Bot telah restart
+reloadCommand=Perintah $1 berhasil dimuat
+reloadEvent=Event $1 berhasil dimuat
+reloadCommandError=Perintah $1 gagal dimuat: $1
+reloadEventError=Event $1 gagal dimuat: $1
+
+serverUptimeRun=Server telah berjalan di port $1
+commandAdmin=❌ Hanya admin yang dapat menggunakan perintah ini.
+commandWait=❌ Anda telah menggunakan perintah '$1' terlalu cepat. Silakan coba lagi setelah $2 detik.
+commandNsfw=❌ Perintah NSFW tidak dapat digunakan di grup ini.
