@@ -1,0 +1,22 @@
+# utils/listen.js
+currentlyLogged=Kasalukuyang nakalagda...
+
+loginSuccess=Nakalagda na ng matagumpay - $1 ($2)
+loginError=Naganap ang error sa paglalagda
+loadThreadDataSuccess=Naiload na ang datos ng $1 grupo
+loadUserDataSuccess=Naiload na ang datos ng $1 user
+
+pluginLoading=Naglo-load ng mga plugin...
+
+refreshMqtt=Nagpapabago ng MQTT...
+restartedBot=Nababalik na ang bot
+reloadCommand=Naiload na ang $1 komando
+reloadEvent=Naiload na ang $1 kaganapan
+reloadCommandError=Hindi naiload ang komando: $1
+reloadEventError=Hindi naiload ang kaganapan: $1
+
+serverUptimeRun=Nagsimula na ang server sa port $1
+
+commandAdmin=❌ Tanging mga admin lamang ang pwedeng gamitin ang komandong ito.
+commandWait=❌ Ginamit mo na ang komando '$1' ng masyadong mabilis. Pakiusap, subukang muli pagkatapos ng $2 segundo.
+commandNsfw=❌ Hindi pinahihintulutan ang grupo na ito na gumamit ng mga komandong nsfw.
