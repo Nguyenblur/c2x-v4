@@ -16,7 +16,8 @@ const client = {
    cooldowns: new Map(),
    language: new Object(),
    mqttListener: null,
-   config: require('../config/config.main.json')
+   config: require('../config/config.main.json'),
+   nsfw: require('../db/data/nsfw/nsfwGroups.json')
 };
 
 const langFile = fs.readFileSync(`./language/${client.config.LANGUAGE || "vi"}.lang`, { encoding: 'utf-8' })
@@ -245,7 +246,13 @@ function handleMQTTEvents(api) {
                     const expirationTime = Date.now() + waitTime;
                     userCooldowns.set(commandName, expirationTime);
                     userCooldowns.delete(`${commandName}_notified`); 
-                }                              
+                }            
+                if (commandModule.category === "nsfw") {
+                    if (!client.nsfw.includes(message.threadID)) {
+                      api.sendMessage(getLang('commandNsfw'), message.threadID);
+                      return;
+                    }
+                  }
                 if (commandModule.admin && !client.config.UID_ADMIN.includes(message.senderID)) {
                     api.sendMessage(getLang('commandAdmin'), message.threadID);
                     return;
