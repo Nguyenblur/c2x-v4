@@ -13,3 +13,4 @@ reloadEventError=Không thể tải sự kiện: $1
 serverUptimeRun=Đã chạy server với port $1
 commandAdmin=❌ Chỉ admin mới có thể sử dụng lệnh này.
 commandWait=❌ Bạn đã sử dụng lệnh '$1' quá nhanh. Vui lòng thử lại sau $2 giây.
+commandNsfw=❌ Nhóm này không được phép dùng các lệnh nsfw.
