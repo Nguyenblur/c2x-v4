@@ -72,6 +72,7 @@ async function startBot() {
                 if (client.config.RUN_SERVER_UPTIME) {
                     startServer(getLang);
                 }
+                doneAnimation(getLang('pluginLoading'));
                 doneAnimation(getLang('loadThreadDataSuccess', await getAllGroupCount()));
                 doneAnimation(getLang('loadUserDataSuccess', await getAllUserCount()));    
                 client.commands = loadCommands(api);
