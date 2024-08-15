@@ -1,16 +1,23 @@
 # utils/listen.js
-currentlyLogged=Logged in progress
-loginSuccess=Successful login, $1 ($2)
+
+currentlyLogged=Currently logged in...
+
+loginSuccess=Logged in successfully - $1 ($2)
 loginError=An error occurred while logging in
-loadThreadDataSuccess=Completed loading data of $1 group
-loadUserDataSuccess=Data of $1 user completed
+loadThreadDataSuccess=Loaded data for $1 group
+loadUserDataSuccess=Loaded data for $1 user
+
+pluginLoading=Loading plugins...
+
 refreshMqtt=Refreshing MQTT...
 restartedBot=Bot restarted
-reloadCommand=$1 command completed
-reloadEvent=$1 event completed
-reloadCammandError=Failed to load command: $1
+reloadCommand=Loaded $1 command(s)
+reloadEvent=Loaded $1 event(s)
+reloadCommandError=Failed to load command: $1
 reloadEventError=Failed to load event: $1
-serverUptimeRun=Server is running on port $1
+
+serverUptimeRun=Server started at port $1
+
 commandAdmin=❌ Only admins can use this command.
-commandWait=❌ You used command '$1' too quickly. Please try again in $2 seconds.
-commandNsfw=❌ This group is not allowed to use NSFW commands.
+commandWait=❌ You've used the command '$1' too quickly. Please try again after $2 seconds.
+commandNsfw=❌ This group is not allowed to use nsfw commands.
