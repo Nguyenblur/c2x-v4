@@ -1,0 +1,21 @@
+# utils/listen.js
+currentlyLogged=वर्तमान में लॉग्ड इन...
+
+loginSuccess=लॉग्ड इन सफलतापूर्वक - $1 ($2)
+loginError=लॉग्ड इन में त्रुटि हुई
+loadThreadDataSuccess=$1 समूह का डेटा लोड हो गया
+loadUserDataSuccess=$1 उपयोगकर्ता का डेटा लोड हो गया
+
+pluginLoading=प्लगइन्स लोड हो रहे हैं...
+
+refreshMqtt=एमक्यूटी को रिफ्रेश किया जा रहा है...
+restartedBot=बॉट फिर से शुरू हो गया
+reloadCommand=$1 कमांड लोड हो गया
+reloadEvent=$1 ईवेंट लोड हो गया
+reloadCommandError=$1 कमांड लोड नहीं हो सका: $1
+reloadEventError=$1 ईवेंट लोड नहीं हो सका: $1
+
+serverUptimeRun=सर्वर $1 पोर्ट पर शुरू हो गया
+commandAdmin=❌ केवल एडमिन ही इस कमांड का उपयोग कर सकते हैं।
+commandWait=❌ आपने '$1' कमांड का उपयोग बहुत जल्दी किया है। कृपया $2 सेकंड के बाद पुनः प्रयास करें।
+commandNsfw=❌ इस समूह में एनएसएफडब्ल्यू कमांड का उपयोग नहीं किया जा सकता है।
