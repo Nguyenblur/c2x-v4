@@ -1,5 +1,4 @@
 # utils/listen.js
-
 currentlyLogged=Currently logged in...
 
 loginSuccess=Logged in successfully - $1 ($2)
