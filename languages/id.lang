@@ -1,0 +1,49 @@
+# penangan/listen.js
+currentLogged=Saat ini masuk...
+
+loginSuccess=Login berhasil - $1 ($2)
+loginError=Terjadi kesalahan saat login
+loadThreadDataSuccess=Selesai memuat data $1 grup
+loadUserDataSuccess=Data $1 pengguna selesai
+logoutAccount=Akun Anda telah keluar
+
+pluginLoading=Menyiapkan plugin
+
+refreshMqtt=Menyegarkan MQTT...
+reloadCommand=$1 perintah selesai
+reloadEvent=$1 acara selesai
+reloadSuccess=-------Muat Ulang Berhasil-------
+reloadCammandError=Gagal memuat perintah: $1
+reloadEventError=Gagal memuat acara: $1
+
+serverUptimeRun=Server diinisialisasi pada port $1
+
+checkpointAccount=Akun Anda telah dikunci
+commandAdmin=❌ Hanya admin yang dapat menggunakan perintah ini.
+commandWait=❌ Anda menggunakan perintah '$1' terlalu cepat. Silakan coba lagi dalam $2 detik.
+commandNsfw=❌ Grup ini tidak diperbolehkan menggunakan perintah nsfw.
+
+# checkUpdate.js
+newVersionAvailable=Versi baru tersedia, harap perbarui untuk merasakan fitur baru.
+
+upToDate=Anda menggunakan versi terbaru.
+
+errorCheckingVersion=Terjadi kesalahan saat memeriksa versi: $1
+errorReadingPackageJson=Terjadi kesalahan saat membaca package.json atau memeriksa versi: $1
+
+#build.js
+restartBot=Memulai ulang...
+
+tempFolderDoesNotExist=Folder .temp tidak ada
+tempFolderCreated=Dibuat folder .temp
+tempFolderCleaned=Membersihkan folder .temp
+
+errorOccurred=Terjadi kesalahan $1
+errorCleaningTempFolder=Kesalahan saat membersihkan folder .temp: $1
+enterPrefix=Silakan masukkan awalan:
+enterUidAdmin=Silakan masukkan UID admin:
+enterIconUnsend=Silakan masukkan ikon untuk membatalkan pengiriman secara otomatis ketika dilepaskan:
+
+setupComplete=Pengaturan selesai
+
+appStateFileNotFound=File appstate.json tidak ada

@@ -1,0 +1,52 @@
+# handlers/listen.js
+currentlyLogged=Login...
+
+loginSuccess=Login successful - $1 ($2)
+loginError=Error while logging in
+loadThreadDataSuccess=Finished loading data for $1 group
+loadUserDataSuccess=Finished loading data for $1 user
+logoutAccount=Your account is logged out
+
+pluginLoading=Preparing plugins
+
+refreshMqtt=Refreshing MQTT...
+reloadCommand=Finished loading $1 command
+reloadEvent=Finished loading $1 event
+reloadSuccess=-------Reload Success-------
+reloadCammandError=Failed to load command: $1
+reloadEventError=Failed to load event: $1
+
+serverUptimeRun=Server initialized at port $1
+
+checkpointAccount=Your account is locked
+commandAdmin=❌ Only admins can use this command.
+
+commandWait=❌ You used command '$1' too quickly. Please try again in $2 seconds.
+
+commandNsfw=❌ This group is not allowed to use nsfw commands.
+
+# checkUpdate.js
+newVersionAvailable=A new version is available, please update to experience new features.
+
+upToDate=You are using the latest version.
+
+errorCheckingVersion=An error occurred while checking version: $1
+
+errorReadingPackageJson=An error occurred while reading package.json or checking version: $1
+
+# build.js
+restartingBot=Restarting...
+
+tempFolderDoesNotExist=The .temp folder does not exist
+tempFolderCreated=The .temp folder was created
+tempFolderCleaned=The .temp folder was cleaned up
+
+errorOccurred=An error occurred $1
+errorCleaningTempFolder=An error occurred while cleaning up the .temp folder: $1
+enterPrefix=Please enter prefix:
+enterUidAdmin=Please enter admin UID:
+enterIconUnsend=Please enter icon to auto unsend when dropped:
+
+setupComplete=Setup complete
+
+appStateFileNotFound=The appstate.json file does not exist

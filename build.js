@@ -1,110 +1,106 @@
-const { doneAnimation } = require('./logger/index');
+const { doneAnimation, errAnimation } = require('./logger/index');
 const fs = require('fs');
 const readline = require('readline');
 const { spawn } = require('child_process');
-const axios = require('axios'); 
+const { client } = require('./lib/Botclient');
+const LanguageManager = require('./lib/LanguageManager');
+const lang = new LanguageManager(client);
 
-const checkForUpdates = async () => {
-    try {
-        const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-        const currentVersion = packageJson.version;
-        try {
-            const response = await axios.get(`${String.fromCharCode(104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,46,99,111,109,47,78,103,117,121,101,110,98,108,117,114,47,99,50,120,47,109,97,105,110,47,112,97,99,107,97,103,101,46,106,115,111,110)}`);
-            const remotePackageJson = response.data;
-            const latestVersion = remotePackageJson.version;
+const CONFIG_FILE = './config/config.main.json';
+const TEMP_FOLDER = './.temp';
+const APPSTATE_FILE = './appstate.json';
 
-            if (latestVersion !== currentVersion) {
-                console.info(`Phiên bản mới có sẵn: ${latestVersion}. Hãy cập nhật để sử dụng các tính năng mới.`);
-            } else {
-                doneAnimation('Bạn đang sử dụng phiên bản mới nhất.');
-            }
-        } catch (error) {
-            console.error('Đã xảy ra lỗi khi kiểm tra phiên bản:', error.message);
-        }
-    } catch (error) {
-        console.error('Đã xảy ra lỗi khi đọc package.json hoặc kiểm tra phiên bản:', error.message);
-    }
-};
+const _1_MINUTE = 60000;
+let restartCount = 0;
 
 const startChatbot = () => {
-    const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "utils/listen.js"], {
-        cwd: __dirname,
-        stdio: "inherit", 
-        shell: true
-    });
+  const chatbotProcess = spawn("node", ["--trace-warnings", "--async-stack-traces", "handlers/listen.js"], {
+    cwd: __dirname,
+    stdio: "inherit",
+    shell: true
+  });
 
-    chatbotProcess.on("close", async (exitCode) => {
-        if (exitCode === 1) {
-            await restartChatbot();
-        } else if (String(exitCode).startsWith("2")) {
-            const delayInSeconds = parseInt(String(exitCode).replace('2', ''));
-            console.log(`Khởi động lại sau ${delayInSeconds} giây do mã lỗi ${exitCode}...`);
-            await new Promise((resolve) => setTimeout(resolve, delayInSeconds * 1000));
-            await restartChatbot();
-        }
-    });
+  chatbotProcess.on("close", async (code) => {
+    handleRestartCount();
+    if (code !== 0 && restartCount < 5) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await restartChatbot();
+    }
+  });
 
-    chatbotProcess.on("error", (error) => {
-        console.log("Đã xảy ra lỗi: " + error.message, "[ Khởi động ]");
-    });
+  chatbotProcess.on("error", (error) => {
+    console.log(lang.translate('errorOccurred', error.message));
+  });
 };
 
 const restartChatbot = async () => {
-    console.info("Đang khởi động lại...");
-    await cleanupTempFolder();
-    startChatbot();
+  console.info(lang.translate('restartingBot'));
+  await cleanupTempFolder();
+  startChatbot();
 };
 
+function handleRestartCount() {
+  restartCount++;
+  setTimeout(() => {
+      restartCount--;
+  }, _1_MINUTE);
+}
+
 const cleanupTempFolder = async () => {
-    try {
-        const tempFolder = './.temp';
-        if (!fs.existsSync(tempFolder)) {
-            console.info('Thư mục .temp không tồn tại. Đang tạo thư mục...');
-            fs.mkdirSync(tempFolder);
-            doneAnimation('Đã tạo thư mục .temp');
-        } else {
-            const tempFiles = fs.readdirSync(tempFolder);
-            for (const file of tempFiles) {
-                fs.unlinkSync(`${tempFolder}/${file}`);
-            }
-            doneAnimation('Đã dọn dẹp thư mục .temp');
-        }
-    } catch (error) {
-        console.error('Đã xảy ra lỗi khi dọn dẹp thư mục .temp:', error.message);
+  try {
+    if (!fs.existsSync(TEMP_FOLDER)) {
+      console.info(lang.translate('tempFolderDoesNotExist'));
+      fs.mkdirSync(TEMP_FOLDER);
+      doneAnimation(lang.translate('tempFolderCreated'));
+    } else {
+      const tempFiles = fs.readdirSync(TEMP_FOLDER);
+      for (const file of tempFiles) {
+        fs.unlinkSync(`${TEMP_FOLDER}/${file}`);
+      }
+      doneAnimation(lang.translate('tempFolderCleaned'));
     }
+  } catch (error) {
+    errAnimation(lang.translate('errorCleaningTempFolder', error.message));
+  }
 };
 
 const promptUserForConfiguration = async () => {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  const askQuestion = (message) => new Promise((resolve) => {
+    rl.question(message, (answer) => {
+      resolve(answer.trim());
     });
+  });
 
-    const nhapDuLieu = (message) => new Promise((resolve) => {
-        rl.question(message, (answer) => {
-            resolve(answer.trim());
-        });
-    });
+  const prefix = await askQuestion(lang.translate('enterPrefix'));
+  const uidAdmin = await askQuestion(lang.translate('enterUidAdmin'));
+  const icon_unsend = await askQuestion(lang.translate('enterIconUnsend'));
+  rl.close();
 
-    const prefix = await nhapDuLieu('Hãy Nhập Prefix: ');
-    const uidAdmin = await nhapDuLieu('Hãy Nhập Uid Admin: ');
-    const icon_unsend = await nhapDuLieu('Hãy Nhập Icon Để Auto UnSend khi thả: ');
-    rl.close();
-
-    fs.writeFileSync('./config/config.main.json', JSON.stringify({
-        PORT: 8080,
-        RUN_SERVER_UPTIME: true,
-        LANGUAGE: "vi",
-        ICON_UNSEND: icon_unsend,
-        PREFIX: prefix,
-        UID_ADMIN: [uidAdmin]
-    }, null, 2));  
-    doneAnimation('Setup hoàn tất...');
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify({
+    FCA_OPTION: {
+      listenEvents: true,
+      autoMarkDelivery: false,
+      updatePresence: true,
+      logLevel: "silent"
+    },
+    PORT: 8080,
+    RUN_SERVER_UPTIME: true,
+    LANGUAGE: "en",
+    ICON_UNSEND: icon_unsend,
+    PREFIX: prefix,
+    UID_ADMIN: [uidAdmin]
+  }, null, 2));
+  doneAnimation(lang.translate('setupComplete'));
 };
 
 const main = async () => {
-    if (!fs.existsSync('./config/config.main.json')) {
-        console.log(`
+  if (!fs.existsSync(CONFIG_FILE)) {
+    console.log(`
             ░██████╗███████╗████████╗██╗░░░██╗██████╗░░░░░░░░█████╗░██████╗░██╗░░██╗
             ██╔════╝██╔════╝╚══██╔══╝██║░░░██║██╔══██╗░░░░░░██╔══██╗╚════██╗╚██╗██╔╝
             ╚█████╗░█████╗░░░░░██║░░░██║░░░██║██████╔╝█████╗██║░░╚═╝░░███╔═╝░╚███╔╝░
@@ -112,16 +108,15 @@ const main = async () => {
             ██████╔╝███████╗░░░██║░░░╚██████╔╝██║░░░░░░░░░░░╚█████╔╝███████╗██╔╝╚██╗
             ╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░░░░░░░░╚════╝░╚══════╝╚═╝░░╚═╝
         `);
-        await promptUserForConfiguration();
-    }
+    await promptUserForConfiguration();
+  }
 
-    await cleanupTempFolder();
-    if (!fs.existsSync('./appstate.json')) {
-        console.error('Không tìm thấy tệp tin appstate.json');
-        process.exit(0);
-    }
-    await checkForUpdates();
-    startChatbot();
+  await cleanupTempFolder();
+  if (!fs.existsSync(APPSTATE_FILE)) {
+    errAnimation(lang.translate('appStateFileNotFound'));
+    process.exit(0);
+  }
+  startChatbot();
 };
 
 main();

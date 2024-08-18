@@ -1,0 +1,49 @@
+# handler/listen.js
+currentlyLogged=Kasalukuyang naka-log in...
+
+loginSuccess=Matagumpay na pag-log in - $1 ($2)
+loginError=Naganap ang isang error habang nagla-log in
+loadThreadDataSuccess=Nakumpleto ang pag-load ng data ng $1 na pangkat
+loadUserDataSuccess=Data ng $1 user na nakumpleto
+logoutAccount=Naka-log out ang iyong account
+
+pluginLoading=Paghahanda ng mga plugin
+
+refreshMqtt=Nire-refresh ang MQTT...
+reloadCommand=$1 na utos ang natapos
+reloadEvent=$1 kaganapan ang natapos
+reloadSuccess=-------Reload Successful-------
+reloadCammandError=Nabigong i-load ang command: $1
+reloadEventError=Nabigong i-load ang kaganapan: $1
+
+serverUptimeRun=Nasimulan ang server sa port $1
+
+checkpointAccount=Na-lock ang iyong account
+commandAdmin=❌ Mga admin lang ang makakagamit ng command na ito.
+commandWait=❌ Masyado kang mabilis gumamit ng command na '$1'. Pakisubukang muli sa loob ng $2 segundo.
+commandNsfw=❌ Ang grupong ito ay hindi pinapayagang gumamit ng nsfw commands.
+
+# checkUpdate.js
+newVersionAvailable=May bagong bersyon na magagamit, mangyaring i-update upang makaranas ng mga bagong tampok.
+
+upToDate=Ginagamit mo ang pinakabagong bersyon.
+
+errorCheckingVersion=May naganap na error habang sinusuri ang bersyon: $1
+errorReadingPackageJson=May naganap na error habang binabasa ang package.json o sinusuri ang bersyon: $1
+
+#build.js
+restartingBot=Nagsisimula muli...
+
+tempFolderDoesNotExist=Folder .temp ay hindi umiiral
+tempFolderCreated=Gumawa ng .temp na folder
+tempFolderCleaned=Nilinis ang .temp na folder
+
+errorOccurred=May naganap na error $1
+errorCleaningTempFolder=Error sa paglilinis ng .temp na folder: $1
+enterPrefix=Pakilagay ang prefix:
+enterUidAdmin=Pakilagay ang admin UID:
+enterIconUnsend=Mangyaring magpasok ng isang icon upang awtomatikong i-unsend kapag inilabas:
+
+setupComplete=Nakumpleto ang setup
+
+appStateFileNotFound=Ang file na appstate.json ay wala

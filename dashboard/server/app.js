@@ -12,9 +12,9 @@ app.get('/', (req, res) => {
         
 const PORT = config.PORT || 3000;  
 
-const startServer = (getLang) => {
+const startServer = (lang) => {
     app.listen(PORT, () => {
-        doneAnimation(getLang('serverUptimeRun', PORT));
+        doneAnimation(lang.translate('serverUptimeRun', PORT));
     });
 };
 

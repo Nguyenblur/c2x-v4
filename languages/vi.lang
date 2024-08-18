@@ -1,0 +1,49 @@
+﻿# handlers/listen.js
+currentlyLogged=Đang đăng nhập...
+
+loginSuccess=Đăng nhập thành công - $1 ($2)
+loginError=Đã xảy ra lỗi khi đăng nhập
+loadThreadDataSuccess=Đã tải xong dữ liệu của $1 nhóm
+loadUserDataSuccess=Đã tải xong dữ liệu của $1 người dùng
+logoutAccount=Tài khoản của bạn đã đăng xuất
+
+pluginLoading=Đang chuẩn bị các plugin
+
+refreshMqtt=Đang làm mới MQTT...
+reloadCommand=Đã tải xong $1 lệnh
+reloadEvent=Đã tải xong $1 sự kiện
+reloadSuccess=-------Reload Thành Công-------
+reloadCammandError=Không thể tải lệnh: $1
+reloadEventError=Không thể tải sự kiện: $1
+
+serverUptimeRun=Đã khởi tạo server tại cổng $1
+
+checkpointAccount=Tài khoản của bạn đã bị khóa
+commandAdmin=❌ Chỉ admin mới có thể sử dụng lệnh này.
+commandWait=❌ Bạn đã sử dụng lệnh '$1' quá nhanh. Vui lòng thử lại sau $2 giây.
+commandNsfw=❌ Nhóm này không được phép dùng các lệnh nsfw.
+
+# checkUpdate.js
+newVersionAvailable=Đã có phiên bản mới, hãy cập nhật để trải nghiệm các tính năng mới.
+
+upToDate=Bạn đang sử dụng phiên bản mới nhất.
+
+errorCheckingVersion=Đã xảy ra lỗi khi kiểm tra phiên bản: $1
+errorReadingPackageJson=Đã xảy ra lỗi khi đọc package.json hoặc kiểm tra phiên bản: $1
+
+# build.js
+restartingBot=Đang khởi động lại...
+
+tempFolderDoesNotExist=Thư mục .temp không tồn tại
+tempFolderCreated=Đã tạo thư mục .temp
+tempFolderCleaned=Đã dọn dẹp thư mục .temp
+
+errorOccurred=Lỗi đã xảy ra $1
+errorCleaningTempFolder=Lỗi khi dọn dẹp thư mục .temp: $1
+enterPrefix=Hãy nhập prefix:
+enterUidAdmin=Hãy nhập UID admin:
+enterIconUnsend=Hãy nhập icon để auto unsend khi thả:
+
+setupComplete=Setup hoàn tất
+
+appStateFileNotFound=Tệp tin appstate.json không tồn tại

@@ -1,4 +1,10 @@
 {
+  "FCA_OPTION": {
+    "listenEvents": true,
+    "autoMarkDelivery": false,
+    "updatePresence": true,
+    "logLevel": "silent"
+  },
   "PORT": 8080,
   "RUN_SERVER_UPTIME": true,
   "LANGUAGE": "vi",

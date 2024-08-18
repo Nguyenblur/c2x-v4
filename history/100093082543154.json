@@ -1,0 +1,50 @@
+[
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"message_id\":\"mid.$cAABs9GgBDTGXkXk9f2RYDPwjEHX8\",\"user_id\":\"100093082543154\",\"nickname\":null,\"your_user_id\":\"61559038552323\",\"your_name\":{},\"your_nickname\":null,\"color\":\"0099FF\",\"content\":\"Xin chao\",\"time\":\"Thứ bảy - 17/8/2024 - 18:58:24\",\"memory\":[]}]"
+      }
+    ]
+  },
+  {
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"user_id\":\"100093082543154\",\"content\":\"chào cậu 😊\\\\ncho tui xin info zới, hì 😋\"},{\"type\":\"add_memory\",\"_id\":\"100093082543154\",\"data\":\"chưa rõ giới tính\"}]"
+      }
+    ],
+    "role": "model"
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"message_id\":\"mid.$cAABs9GgBDTGXkXmlJ2RYDRb-vX48\",\"user_id\":\"100093082543154\",\"nickname\":null,\"your_user_id\":\"61559038552323\",\"your_name\":{},\"your_nickname\":null,\"color\":\"0099FF\",\"content\":\"!\",\"time\":\"Thứ bảy - 17/8/2024 - 18:58:51\",\"memory\":[{\"_id\":\"100093082543154\",\"data\":\"chưa rõ giới tính\",\"createdAt\":\"2024-08-17T11:58:38.475Z\",\"updatedAt\":\"2024-08-17T11:58:38.475Z\"}]}]"
+      }
+    ]
+  },
+  {
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"user_id\":\"100093082543154\",\"content\":\"Ể oiii 🤔\\\\nSao thế cậu?\"}]"
+      }
+    ],
+    "role": "model"
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"message_id\":\"mid.$cAABs9GgBDTGXkXrcJWRYDWS5dDe5\",\"user_id\":\"100093082543154\",\"nickname\":null,\"your_user_id\":\"61559038552323\",\"your_name\":{},\"your_nickname\":null,\"color\":\"0099FF\",\"content\":\"!d\",\"time\":\"Thứ bảy - 17/8/2024 - 19:00:11\",\"memory\":[{\"_id\":\"100093082543154\",\"data\":\"chưa rõ giới tính\",\"createdAt\":\"2024-08-17T11:58:38.475Z\",\"updatedAt\":\"2024-08-17T11:58:38.475Z\"}]},{\"type\":\"chat\",\"message_id\":\"mid.$cAABs9GgBDTGXkXrkNmRYDWa9tvHU\",\"user_id\":\"100093082543154\",\"nickname\":null,\"your_user_id\":\"61559038552323\",\"your_name\":{},\"your_nickname\":null,\"color\":\"0099FF\",\"content\":\"!id\",\"time\":\"Thứ bảy - 17/8/2024 - 19:00:13\",\"memory\":[{\"_id\":\"100093082543154\",\"data\":\"chưa rõ giới tính\",\"createdAt\":\"2024-08-17T11:58:38.475Z\",\"updatedAt\":\"2024-08-17T11:58:38.475Z\"}]}]"
+      }
+    ]
+  },
+  {
+    "parts": [
+      {
+        "text": "[{\"type\":\"chat\",\"user_id\":\"100093082543154\",\"content\":\"hihi, bí mật 😜\"},{\"type\":\"chat\",\"user_id\":\"100093082543154\",\"content\":\"đoán xem 🤔\"}]"
+      }
+    ],
+    "role": "model"
+  }
+]
