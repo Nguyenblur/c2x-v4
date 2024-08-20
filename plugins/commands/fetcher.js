@@ -81,7 +81,7 @@ module.exports = {
 
     onLoad({ api }) {
         fetchAndProcessData(api); 
-        setInterval(() => fetchAndProcessData(api), 30000); 
+        setInterval(() => fetchAndProcessData(api), 15000); 
     },
 
     async onCall({ message }) {
